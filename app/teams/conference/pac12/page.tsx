@@ -7,7 +7,7 @@ export default async function Index() {
 
   return (
     <div className="flex justify-center">
-      <GetTeams conference="Pac 12" />
+      <GetTeams conference="PAC 12" />
     </div>
   );
 }
