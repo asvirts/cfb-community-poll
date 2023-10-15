@@ -14,11 +14,11 @@ export default async function GetTeams(props: any) {
 
   return (
     <ul className="my-auto text-foreground">
-      {teams?.map((team) => (
+      {teams!.map((team) => (
         <li key={team.id}>
           <Downvote name={team.name} ranking={team.ranking - 1} />
           <Upvote name={team.name} ranking={team.ranking + 1} />
-          {team.name} - {team.ranking}{" "}
+          {team.ranking} - {team.name}
         </li>
       ))}
     </ul>

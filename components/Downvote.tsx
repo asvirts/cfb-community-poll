@@ -6,11 +6,14 @@ export default async function Downvote(props: any) {
   const cookieStore = cookies();
   const supabase = createServerComponentClient({ cookies: () => cookieStore });
 
-  const { data: teams } = await supabase
+  let { data, error } = await supabase
     .from("teams")
     .update({ ranking: `${props.ranking}` })
-    .eq("name", `${props.name}`)
+    .eq("id", `${props.id}`)
     .select();
+
+  if (error) console.error(error);
+  else console.log(data);
 
   return (
     <button>
