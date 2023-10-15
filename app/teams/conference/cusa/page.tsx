@@ -1,4 +1,4 @@
-import GetACCTeams from "@/components/fetch/GetACCTeams";
+import GetTeams from "@/components/fetch/GetTeams";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 
@@ -7,7 +7,7 @@ export default async function Index() {
 
   return (
     <div className="flex justify-center">
-      <GetACCTeams />
+      <GetTeams conference="C-USA" />
     </div>
   );
 }

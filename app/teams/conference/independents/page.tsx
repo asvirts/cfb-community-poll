@@ -1,4 +1,4 @@
-import GetAllTeams from "@/components/fetch/GetAllTeams";
+import GetTeams from "@/components/fetch/GetTeams";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 
@@ -6,8 +6,8 @@ export default async function Index() {
   const supabase = createServerComponentClient({ cookies });
 
   return (
-    <div className="flex justify-center py-2">
-      <GetAllTeams />
+    <div className="flex justify-center">
+      <GetTeams conference="Independents" />
     </div>
   );
 }
