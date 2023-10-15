@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import "./globals.css";
+import Head from "next/head";
 
 export const metadata = {
   title: "CFB Community Poll",
@@ -13,6 +14,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <Head>
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/icon?family=Material+Icons"
+        />
+      </Head>
       <body>
         <main>
           <Navbar />

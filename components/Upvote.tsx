@@ -1,15 +1,20 @@
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
+import ArrowCircleUpRoundedIcon from "@mui/icons-material/ArrowCircleUpRounded";
 
 export default async function Upvote(props: any) {
   const cookieStore = cookies();
   const supabase = createServerComponentClient({ cookies: () => cookieStore });
 
-  const { data, error } = await supabase
+  const { data: teams } = await supabase
     .from("teams")
-    .update({ ranking: "1" }).
+    .update({ ranking: `${props.ranking}` })
     .eq("name", `${props.name}`)
     .select();
 
-  return <div>up</div>;
+  return (
+    <button>
+      <ArrowCircleUpRoundedIcon />
+    </button>
+  );
 }
