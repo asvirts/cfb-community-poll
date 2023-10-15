@@ -7,7 +7,7 @@ export default async function Index() {
 
   return (
     <div className="flex justify-center">
-      <h1 className="font-bold text-4xl">Welcome</h1>
+      <GetAllTeams />
     </div>
   );
 }
