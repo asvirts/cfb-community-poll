@@ -1,4 +1,3 @@
-import GetAllTeams from "@/components/fetch/GetAllTeams";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 

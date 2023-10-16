@@ -1,7 +1,5 @@
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
-import Upvote from "../Upvote";
-import Downvote from "../Downvote";
 
 export default async function GetAllTeams() {
   const cookieStore = cookies();
@@ -13,8 +11,6 @@ export default async function GetAllTeams() {
     <ul className="my-auto text-foreground">
       {teams?.map((team) => (
         <li key={team.id}>
-          <Downvote id={team.id} />
-          <Upvote id={team.id} />
           {team.ranking} - {team.name}
         </li>
       ))}
