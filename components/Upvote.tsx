@@ -6,10 +6,11 @@ export default async function Upvote(props: any) {
   const cookieStore = cookies();
   const supabase = createServerComponentClient({ cookies: () => cookieStore });
 
-  let { data, error } = await supabase.rpc("increment", {
-    row_id: props.id,
-    x: 1
-  });
+  const { data, error } = await supabase
+    .from("teams")
+    .update({ ranking: 1 })
+    .eq("id", props.id)
+    .select();
 
   if (error) console.error(error);
   else console.log(data);
