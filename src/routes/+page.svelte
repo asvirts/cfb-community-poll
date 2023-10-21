@@ -11,11 +11,7 @@
         let newRanking = Number(ranking) + 1
         let funcId = Number(id)
 
-        const { data } = await supabase
-  .from('teams')
-  .update({ ranking: newRanking })
-  .eq('id', funcId)
-  .select()
+        const { data } = await supabase.from('teams').update({ ranking: newRanking }).eq('id', funcId).select()
     }
 
     // @ts-ignore
@@ -24,16 +20,33 @@
         let newRanking = Number(ranking) - 1
         let funcId = Number(id)
 
-        const { data } = await supabase
-  .from('teams')
-  .update({ ranking: newRanking })
-  .eq('id', funcId)
-  .select()
+        const { data } = await supabase.from('teams').update({ ranking: newRanking }).eq('id', funcId).select()
     }
 </script>
 
-  <ul>
-    {#each data.teams as team}
-      <li>{team.name} {team.team_name} are in the {team.conference} and their current ranking is {team.ranking} <button on:click={upvoteTeam(`${team.ranking}`, `${team.id}`)}>Up</button> <button on:click={downvoteTeam(`${team.ranking}`, `${team.id}`)}>Down</button></li>
+<div class="overflow-x-auto">
+  <table class="table">
+    <!-- head -->
+    <thead>
+      <tr>
+        <th>Rank</th>
+        <th>Vote</th>
+        <th>Team</th>
+        <th>Conference</th>
+      </tr>
+    </thead>
+    <tbody>
+      {#each data.teams as team}
+      <tr>
+        <th>{team.ranking}</th>
+        <td>
+          <button class="btn btn-primary" on:click={() => upvoteTeam(`${team.ranking}`, `${team.id}`)}>Up</button>
+          <button class="btn btn-secondary" on:click={() => downvoteTeam(`${team.ranking}`, `${team.id}`)}>Down</button>
+        </td>
+        <td>{team.name}</td>
+        <td>{team.conference}</td>
+      </tr>
     {/each}
-  </ul>
+    </tbody>
+  </table>
+</div>
