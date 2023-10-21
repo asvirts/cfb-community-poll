@@ -6,3 +6,11 @@ import { supabase } from "$lib/supabaseClient";
       teams: data ?? [],
     };
   }
+
+  export async function updateTeam(name: string, id: number) {
+    const { data } = await supabase
+  .from('teams')
+  .update({ name: name })
+  .eq(id, 1)
+  .select()
+  }
