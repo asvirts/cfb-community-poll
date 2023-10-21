@@ -1,9 +1,8 @@
 <script>
     import { supabase } from '$lib/supabaseClient.js';
-    
-    // @ts-ignore
+    import { enhance } from '$app/forms';
+
     export let data;
-    console.log(data)
 
     // @ts-ignore
     async function upvoteTeam(ranking, id) {
@@ -22,6 +21,7 @@
 
         const { data } = await supabase.from('teams').update({ ranking: newRanking }).eq('id', funcId).select()
     }
+
 </script>
 
 <div class="overflow-x-auto">
@@ -29,7 +29,7 @@
     <!-- head -->
     <thead>
       <tr>
-        <th>Rank</th>
+        <th>Score (Higher is better)</th>
         <th>Vote</th>
         <th>Team</th>
         <th>Conference</th>
@@ -37,15 +37,19 @@
     </thead>
     <tbody>
       {#each data.teams as team}
+      {#key team.id}
       <tr>
         <th>{team.ranking}</th>
         <td>
-          <button class="btn btn-primary" on:click={() => upvoteTeam(`${team.ranking}`, `${team.id}`)}>Up</button>
-          <button class="btn btn-secondary" on:click={() => downvoteTeam(`${team.ranking}`, `${team.id}`)}>Down</button>
+          <div class="btn-group">
+            <button class="btn btn-active" on:click={() => upvoteTeam(`${team.ranking}`, `${team.id}`)}>Up</button>
+            <button class="btn" on:click={() => downvoteTeam(`${team.ranking}`, `${team.id}`)}>Down</button>
+          </div>
         </td>
         <td>{team.name}</td>
         <td>{team.conference}</td>
       </tr>
+      {/key}
     {/each}
     </tbody>
   </table>
