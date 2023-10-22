@@ -1,5 +1,7 @@
 <script>
     import { supabase } from '$lib/supabaseClient.js';
+    import GoArrowUp from 'svelte-icons/go/GoArrowUp.svelte'
+    import GoArrowDown from 'svelte-icons/go/GoArrowDown.svelte'
     
     // @ts-ignore
     export let data;
@@ -11,7 +13,9 @@
         let newRanking = Number(ranking) + 1
         let funcId = Number(id)
 
-        const { data } = await supabase.from('teams').update({ ranking: newRanking }).eq('id', funcId).select()
+        let { data } = await supabase.from('teams').update({ ranking: newRanking }).eq('id', funcId).select()
+
+        location.reload()
     }
 
     // @ts-ignore
@@ -20,31 +24,37 @@
         let newRanking = Number(ranking) - 1
         let funcId = Number(id)
 
-        const { data } = await supabase.from('teams').update({ ranking: newRanking }).eq('id', funcId).select()
+        let { data } = await supabase.from('teams').update({ ranking: newRanking }).eq('id', funcId).select()
+
+        location.reload()
     }
 </script>
 
-<div class="overflow-x-auto">
-  <table class="table">
+<div class="overflow-x-auto mx-auto block">
+  <table class="table table-zebra">
     <!-- head -->
     <thead>
       <tr>
-        <th>Rank</th>
-        <th>Vote</th>
-        <th>Team</th>
-        <th>Conference</th>
+        <th class="w-1/6 text-sm">Score (higher = better)</th>
+        <th class="w-1/4 text-sm">Vote</th>
+        <th class="w-1/4 text-sm">Team</th>
+        <th class="w-1/4 text-sm">Conference</th>
       </tr>
     </thead>
     <tbody>
       {#each data.teams as team}
       <tr>
-        <th>{team.ranking}</th>
-        <td>
-          <button class="btn btn-primary" on:click={() => upvoteTeam(`${team.ranking}`, `${team.id}`)}>Up</button>
-          <button class="btn btn-secondary" on:click={() => downvoteTeam(`${team.ranking}`, `${team.id}`)}>Down</button>
+        <th class="w-1/6 text-xl">{team.ranking}</th>
+        <td class="w-1/4">
+          <button class="btn btn-primary" on:click={() => upvoteTeam(`${team.ranking}`, `${team.id}`)}>
+            <GoArrowUp class="icon" />
+          </button>
+          <button class="btn btn-outline btn-primary" on:click={() => downvoteTeam(`${team.ranking}`, `${team.id}`)}>
+            <GoArrowDown class="icon" />
+          </button>
         </td>
-        <td>{team.name}</td>
-        <td>{team.conference}</td>
+        <td class="w-1/4 text-lg">{team.name}</td>
+        <td class="w-1/4 text-lg">{team.conference}</td>
       </tr>
     {/each}
     </tbody>

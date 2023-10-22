@@ -33,6 +33,10 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@supabase/supabase-js": "^2.38.2"
+		"@emotion/react": "^11.11.1",
+		"@emotion/styled": "^11.11.0",
+		"@mui/material": "^5.14.14",
+		"@supabase/supabase-js": "^2.38.2",
+		"svelte-icons": "^2.1.0"
 	}
 }
