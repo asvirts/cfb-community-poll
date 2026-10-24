@@ -1,13 +1,21 @@
-import { auth } from "@clerk/nextjs/server";
-import Link from "next/link";
-import { Suspense } from "react";
-import { connection } from "next/server";
 import { BallotEditor } from "@/components/ballot-editor";
-import { listBallotPicks, listTeams } from "@/lib/db";
 import { DIVISION_PROFILES, type Division } from "@/lib/division";
-import { orderTeams, startingOrder } from "@/lib/poll";
+import type { Team } from "@/lib/poll";
+import { Link } from "@void/react";
 
-export function DivisionBallot({ division }: { division: Division }) {
+export function DivisionBallot({
+  division,
+  teams,
+  userId,
+  hasExistingBallot,
+  error,
+}: {
+  division: Division;
+  teams: Team[];
+  userId: string;
+  hasExistingBallot: boolean;
+  error: string | null;
+}) {
   const profile = DIVISION_PROFILES[division];
 
   return (
@@ -48,59 +56,19 @@ export function DivisionBallot({ division }: { division: Division }) {
         </div>
       </section>
 
-      <Suspense
-        fallback={
-          <div className="flex flex-col gap-3 rounded-2xl border border-line bg-card p-8 text-center">
-            <p className="font-display text-xl tracking-wider text-gold uppercase">
-              Loading your ballot…
-            </p>
-            <p className="text-sm text-muted">{profile.ballotLoading}</p>
-          </div>
-        }
-      >
-        <BallotLoader division={division} />
-      </Suspense>
+      {error ? (
+        <p role="alert" className="rounded-2xl border border-gold/40 bg-card p-6 text-gold">
+          Could not load your {profile.name} ballot. {error}
+        </p>
+      ) : (
+        <BallotEditor
+          key={`${division}-${userId}`}
+          userId={userId}
+          division={division}
+          teams={teams}
+          hasExistingBallot={hasExistingBallot}
+        />
+      )}
     </main>
-  );
-}
-
-async function BallotLoader({ division }: { division: Division }) {
-  await connection();
-  const profile = DIVISION_PROFILES[division];
-  const { userId, redirectToSignIn } = await auth();
-
-  if (!userId) {
-    return redirectToSignIn();
-  }
-
-  let ordered;
-  let hasExistingBallot = false;
-  try {
-    const teams = await listTeams(division);
-    const picks = await listBallotPicks(userId, division);
-    hasExistingBallot = picks.length > 0;
-    ordered = hasExistingBallot
-      ? orderTeams(teams, picks)
-      : startingOrder(teams, profile.seed);
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown database error";
-    return (
-      <p
-        role="alert"
-        className="rounded-2xl border border-gold/40 bg-card p-6 text-gold"
-      >
-        Could not load your {profile.name} ballot. {message}
-      </p>
-    );
-  }
-
-  return (
-    <BallotEditor
-      key={`${division}-${userId}`}
-      userId={userId}
-      division={division}
-      teams={ordered}
-      hasExistingBallot={hasExistingBallot}
-    />
   );
 }

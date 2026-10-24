@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "source": {},
+  "resolved": {
+    "account_id": "8bac5053cc0448ced93c05985636036c",
+    "d1_databases": [
+      {
+        "binding": "DB",
+        "database_name": "cfb-community-poll-db",
+        "database_id": "ab06db27-8461-42c3-bf2c-da1c30769cb3",
+        "migrations_dir": "./db/migrations"
+      }
+    ],
+    "name": "cfb-community-poll"
+  },
+  "text": "{\n  \"account_id\": \"8bac5053cc0448ced93c05985636036c\",\n  \"d1_databases\": [\n    {\n      \"binding\": \"DB\",\n      \"database_name\": \"cfb-community-poll-db\",\n      \"database_id\": \"ab06db27-8461-42c3-bf2c-da1c30769cb3\",\n      \"migrations_dir\": \"./db/migrations\"\n    }\n  ],\n  \"name\": \"cfb-community-poll\"\n}\n"
+}

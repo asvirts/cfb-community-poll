@@ -1,6 +1,4 @@
-"use client";
-
-import Link from "next/link";
+import { Link } from "@void/react";
 import { useMemo, useState } from "react";
 import {
   ApComparisonBadge,
@@ -14,13 +12,7 @@ import { getConferenceMeta, getTeamStyle } from "@/lib/team-meta";
 
 type ViewTab = "all" | "top25" | "conferences";
 
-export function PollBoard({
-  standings,
-  division,
-}: {
-  standings: Standing[];
-  division: Division;
-}) {
+export function PollBoard({ standings, division }: { standings: Standing[]; division: Division }) {
   const profile = DIVISION_PROFILES[division];
   const ballotCount = standings[0]?.ballot_count ?? 0;
   const hasBallots = ballotCount > 0;
@@ -123,8 +115,7 @@ export function PollBoard({
   const firstOutTeam = ordered[profile.playoffRank];
   const topConf = conferenceStats[0];
 
-  const isUnfilteredList =
-    selectedConference === "" && needle === "" && view === "all";
+  const isUnfilteredList = selectedConference === "" && needle === "" && view === "all";
 
   return (
     <div className="flex flex-col gap-8">
@@ -140,9 +131,7 @@ export function PollBoard({
                 <p className="font-display text-sm font-bold tracking-wider text-gold uppercase">
                   Opening Kickoff — Pre-Poll Seedings Active
                 </p>
-                <p className="text-sm leading-relaxed text-cream/90">
-                  {profile.emptyBanner}
-                </p>
+                <p className="text-sm leading-relaxed text-cream/90">{profile.emptyBanner}</p>
               </div>
             </div>
             <Link
@@ -177,7 +166,8 @@ export function PollBoard({
             </span>
           </div>
           <p className="mt-2 border-t border-line/60 pt-2 font-mono text-[11px] text-muted">
-            Max score: {(hasBallots ? maxPointsPerTeam : teamCount).toLocaleString()} pts ({teamCount} pts / #1)
+            Max score: {(hasBallots ? maxPointsPerTeam : teamCount).toLocaleString()} pts (
+            {teamCount} pts / #1)
           </p>
         </div>
 
@@ -188,9 +178,7 @@ export function PollBoard({
               <span className="font-display text-xs font-semibold tracking-widest text-gold uppercase">
                 {hasBallots ? "#1 Consensus Leader" : "#1 Pre-Poll Seed"}
               </span>
-              <span className="font-mono text-xs font-bold text-gold">
-                RANK #1
-              </span>
+              <span className="font-mono text-xs font-bold text-gold">RANK #1</span>
             </div>
             <div className="mt-3 flex items-center gap-3">
               <TeamCrest name={leader.name} size="md" />
@@ -257,8 +245,7 @@ export function PollBoard({
               <span className="text-xs text-muted">avg team rank</span>
             </div>
             <p className="mt-2 border-t border-line/60 pt-2 font-mono text-[11px] text-muted">
-              {topConf.top25Count} in Top 25 • Led by #{topConf.bestRank}{" "}
-              {topConf.bestTeam.name}
+              {topConf.top25Count} in Top 25 • Led by #{topConf.bestRank} {topConf.bestTeam.name}
             </p>
           </div>
         ) : null}
@@ -332,9 +319,7 @@ export function PollBoard({
                 <div className="mt-4 flex flex-col gap-1.5 border-t border-line/60 pt-3">
                   <div className="flex items-center justify-between font-mono text-xs">
                     <span className="text-muted">
-                      {hasBallots
-                        ? `${team.points.toLocaleString()} pts`
-                        : `Seed #${rank}`}
+                      {hasBallots ? `${team.points.toLocaleString()} pts` : `Seed #${rank}`}
                     </span>
                     <span className="text-gold">
                       {hasBallots
@@ -364,9 +349,7 @@ export function PollBoard({
               type="button"
               onClick={() => setView("all")}
               className={`rounded-lg px-3.5 py-1.5 font-display text-sm font-semibold tracking-wider uppercase transition ${
-                view === "all"
-                  ? "bg-gold text-field shadow-sm"
-                  : "text-muted hover:text-cream"
+                view === "all" ? "bg-gold text-field shadow-sm" : "text-muted hover:text-cream"
               }`}
             >
               All {teamCount} Teams
@@ -375,9 +358,7 @@ export function PollBoard({
               type="button"
               onClick={() => setView("top25")}
               className={`rounded-lg px-3.5 py-1.5 font-display text-sm font-semibold tracking-wider uppercase transition ${
-                view === "top25"
-                  ? "bg-gold text-field shadow-sm"
-                  : "text-muted hover:text-cream"
+                view === "top25" ? "bg-gold text-field shadow-sm" : "text-muted hover:text-cream"
               }`}
             >
               Top 25 Only
@@ -453,9 +434,7 @@ export function PollBoard({
               <button
                 key={stat.conference}
                 type="button"
-                onClick={() =>
-                  setSelectedConference(active ? "" : stat.conference)
-                }
+                onClick={() => setSelectedConference(active ? "" : stat.conference)}
                 className={`shrink-0 rounded-lg border px-2.5 py-1 font-display text-xs font-semibold tracking-wider uppercase transition ${
                   active
                     ? "border-gold bg-gold/20 text-gold"
@@ -467,9 +446,7 @@ export function PollBoard({
                   style={{ backgroundColor: meta.accent }}
                 />
                 {stat.conference}{" "}
-                <span className="font-mono text-[10px] opacity-75">
-                  ({stat.teamCount})
-                </span>
+                <span className="font-mono text-[10px] opacity-75">({stat.teamCount})</span>
               </button>
             );
           })}
@@ -519,18 +496,14 @@ export function PollBoard({
                     <td className="px-4 py-3">
                       <ConferenceBadge conference={stat.conference} />
                     </td>
-                    <td className="px-4 py-3 text-right font-mono text-muted">
-                      {stat.teamCount}
-                    </td>
+                    <td className="px-4 py-3 text-right font-mono text-muted">{stat.teamCount}</td>
                     <td className="px-4 py-3 text-right font-mono font-semibold text-cream">
                       {(stat.rankSum / stat.teamCount).toFixed(1)}
                     </td>
                     <td className="px-4 py-3 text-right font-mono text-emerald-300">
                       {stat.top25Count}
                     </td>
-                    <td className="px-4 py-3 text-right font-mono text-gold">
-                      {stat.fieldCount}
-                    </td>
+                    <td className="px-4 py-3 text-right font-mono text-gold">{stat.fieldCount}</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2.5">
                         <TeamCrest name={stat.bestTeam.name} size="sm" />
@@ -583,20 +556,12 @@ export function PollBoard({
                 <th className="px-4 py-3 font-semibold">{profile.comparisonHeader}</th>
                 {hasBallots ? (
                   <>
-                    <th className="px-4 py-3 text-right font-semibold">
-                      Points
-                    </th>
-                    <th className="px-4 py-3 text-right font-semibold">
-                      Avg Rank
-                    </th>
-                    <th className="px-4 py-3 text-right font-semibold">
-                      1st Place
-                    </th>
+                    <th className="px-4 py-3 text-right font-semibold">Points</th>
+                    <th className="px-4 py-3 text-right font-semibold">Avg Rank</th>
+                    <th className="px-4 py-3 text-right font-semibold">1st Place</th>
                   </>
                 ) : (
-                  <th className="px-4 py-3 text-right font-semibold">
-                    1st-Place Value
-                  </th>
+                  <th className="px-4 py-3 text-right font-semibold">1st-Place Value</th>
                 )}
               </tr>
             </thead>
@@ -609,9 +574,7 @@ export function PollBoard({
                     ? Math.min(100, (team.points / maxPointsPerTeam) * 100)
                     : Math.max(4, ((teamCount - rank + 1) / teamCount) * 100);
                 const avgRank =
-                  hasBallots && ballotCount > 0
-                    ? teamCount + 1 - team.points / ballotCount
-                    : rank;
+                  hasBallots && ballotCount > 0 ? teamCount + 1 - team.points / ballotCount : rank;
 
                 const showByeCutline = isUnfilteredList && rank === profile.byeRank;
                 const showPlayoffCutline = isUnfilteredList && rank === profile.playoffRank;

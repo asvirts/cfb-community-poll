@@ -1,7 +1,9 @@
-import { SignUp } from "@clerk/nextjs";
-import { Suspense } from "react";
+import { CredentialsForm } from "@/components/credentials-form";
+import { Link, useRouter } from "@void/react";
 
 export default function SignUpPage() {
+  const next = useRouter().query.get("next");
+  const loginHref = next ? `/login?next=${encodeURIComponent(next)}` : "/login";
   return (
     <main className="mx-auto flex w-full max-w-xl flex-col items-center gap-6 px-4 py-12">
       <div className="flex flex-col items-center gap-2 text-center">
@@ -12,16 +14,17 @@ export default function SignUpPage() {
           Claim Your Ballot
         </h1>
         <p className="max-w-md text-sm text-muted">
-          One verified ballot per subdivision. Rank every FBS team, then rank every FCS team on its own board.
+          One verified ballot per subdivision. Rank every FBS team, then rank every FCS team on its
+          own board.
         </p>
       </div>
-      <Suspense fallback={<p className="text-muted">Loading sign up…</p>}>
-        <SignUp
-          routing="hash"
-          signInUrl="/login"
-          fallbackRedirectUrl="/ballot"
-        />
-      </Suspense>
+      <CredentialsForm mode="sign-up" />
+      <p className="text-sm text-muted">
+        Already registered?{" "}
+        <Link href={loginHref} className="text-gold hover:text-gold-bright">
+          Sign in
+        </Link>
+      </p>
     </main>
   );
 }

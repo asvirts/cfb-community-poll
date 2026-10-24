@@ -1,21 +1,13 @@
 import { AP_TOP_25 } from "@/lib/poll";
 import { getConferenceMeta, getTeamStyle } from "@/lib/team-meta";
 
-const AP_RANK_MAP = new Map<string, number>(
-  AP_TOP_25.map((name, index) => [name, index + 1]),
-);
+const AP_RANK_MAP = new Map<string, number>(AP_TOP_25.map((name, index) => [name, index + 1]));
 
 export function getApRank(teamName: string): number | null {
   return AP_RANK_MAP.get(teamName) ?? null;
 }
 
-export function TeamCrest({
-  name,
-  size = "md",
-}: {
-  name: string;
-  size?: "sm" | "md" | "lg";
-}) {
+export function TeamCrest({ name, size = "md" }: { name: string; size?: "sm" | "md" | "lg" }) {
   const style = getTeamStyle(name);
   const dimensions =
     size === "sm"
@@ -38,12 +30,8 @@ export function TeamCrest({
         className="pointer-events-none absolute inset-y-0 left-0 w-1.5"
         style={{ backgroundColor: style.secondary }}
       />
-      <span
-        className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/18 via-transparent to-black/35"
-      />
-      <span
-        className="relative z-10 pl-1 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]"
-      >
+      <span className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/18 via-transparent to-black/35" />
+      <span className="relative z-10 pl-1 drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)]">
         {style.abbrev}
       </span>
     </div>
@@ -63,10 +51,7 @@ export function ConferenceBadge({ conference }: { conference: string }) {
         borderStyle: "solid",
       }}
     >
-      <span
-        className="h-1.5 w-1.5 rounded-full"
-        style={{ backgroundColor: meta.accent }}
-      />
+      <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: meta.accent }} />
       {conference}
     </span>
   );
@@ -141,7 +126,10 @@ export function ApComparisonBadge({
         title={`Ranked ${delta} spots higher than ${pollShort} #${seedRank}`}
         className="inline-flex items-center gap-1 rounded border border-emerald-400/35 bg-emerald-500/12 px-1.5 py-0.5 font-mono text-[11px] font-medium text-emerald-300"
       >
-        ▲{delta} <span className="text-emerald-200/70">{pollShort} #{seedRank}</span>
+        ▲{delta}{" "}
+        <span className="text-emerald-200/70">
+          {pollShort} #{seedRank}
+        </span>
       </span>
     );
   }
@@ -151,7 +139,10 @@ export function ApComparisonBadge({
       title={`Ranked ${Math.abs(delta)} spots lower than ${pollShort} #${seedRank}`}
       className="inline-flex items-center gap-1 rounded border border-amber-400/35 bg-amber-500/12 px-1.5 py-0.5 font-mono text-[11px] font-medium text-amber-300"
     >
-      ▼{Math.abs(delta)} <span className="text-amber-200/70">{pollShort} #{seedRank}</span>
+      ▼{Math.abs(delta)}{" "}
+      <span className="text-amber-200/70">
+        {pollShort} #{seedRank}
+      </span>
     </span>
   );
 }

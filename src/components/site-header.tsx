@@ -1,13 +1,11 @@
-"use client";
-
-import { Show, UserButton } from "@clerk/nextjs";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Suspense } from "react";
 import { DIVISION_PROFILES } from "@/lib/division";
+import { Link, useRouter, useShared } from "@void/react";
+import { auth } from "void/client";
 
 export function SiteHeader() {
-  const pathname = usePathname();
+  const router = useRouter();
+  const pathname = router.path;
+  const user = useShared().auth.user;
   const isFcs = pathname === "/fcs" || pathname?.startsWith("/ballot/fcs");
   const profile = DIVISION_PROFILES[isFcs ? "FCS" : "FBS"];
   const isPoll = pathname === profile.standingsHref;
@@ -26,15 +24,13 @@ export function SiteHeader() {
             <span className="hidden sm:inline text-line-bright">•</span>
             <span className="hidden sm:inline">{profile.scoringLabel}</span>
           </div>
-          <div className="font-mono text-gold/90">
-            Baseline: {profile.pollTitle} Top 25
-          </div>
+          <div className="font-mono text-gold/90">Baseline: {profile.pollTitle} Top 25</div>
         </div>
       </div>
 
       {/* Main header */}
       <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
-          <Link
+        <Link
           href={profile.standingsHref}
           className="group flex items-center gap-3 focus:outline-none"
         >
@@ -75,9 +71,7 @@ export function SiteHeader() {
             <Link
               href={isBallot ? "/ballot" : "/"}
               className={`rounded-full px-3 py-1.5 font-display text-sm font-semibold tracking-wider uppercase transition-all ${
-                isFcs
-                  ? "text-cream/85 hover:text-cream"
-                  : "bg-gold text-field shadow-sm"
+                isFcs ? "text-cream/85 hover:text-cream" : "bg-gold text-field shadow-sm"
               }`}
             >
               FBS
@@ -85,9 +79,7 @@ export function SiteHeader() {
             <Link
               href={isBallot ? "/ballot/fcs" : "/fcs"}
               className={`rounded-full px-3 py-1.5 font-display text-sm font-semibold tracking-wider uppercase transition-all ${
-                isFcs
-                  ? "bg-gold text-field shadow-sm"
-                  : "text-cream/85 hover:text-cream"
+                isFcs ? "bg-gold text-field shadow-sm" : "text-cream/85 hover:text-cream"
               }`}
             >
               FCS
@@ -97,9 +89,7 @@ export function SiteHeader() {
             <Link
               href={profile.standingsHref}
               className={`rounded-full px-3.5 py-1.5 font-display text-sm font-semibold tracking-wider uppercase transition-all ${
-                isPoll
-                  ? "bg-gold text-field shadow-sm"
-                  : "text-cream/85 hover:text-cream"
+                isPoll ? "bg-gold text-field shadow-sm" : "text-cream/85 hover:text-cream"
               }`}
             >
               Standings
@@ -107,38 +97,47 @@ export function SiteHeader() {
             <Link
               href={profile.ballotHref}
               className={`rounded-full px-3.5 py-1.5 font-display text-sm font-semibold tracking-wider uppercase transition-all ${
-                isBallot
-                  ? "bg-gold text-field shadow-sm"
-                  : "text-cream/85 hover:text-cream"
+                isBallot ? "bg-gold text-field shadow-sm" : "text-cream/85 hover:text-cream"
               }`}
             >
               My Ballot
             </Link>
           </div>
 
-          <Suspense fallback={<div className="h-9 w-28 rounded-full bg-card/60" />}>
-            <Show when="signed-out">
-              <div className="flex items-center gap-2 pl-1">
-                <Link
-                  href="/login"
-                  className="rounded-full bg-gold px-4 py-1.5 font-display text-sm font-bold tracking-wider text-field uppercase shadow-sm transition hover:bg-gold-bright"
-                >
-                  Sign in
-                </Link>
-                <Link
-                  href="/sign-up"
-                  className="rounded-full border border-line-bright bg-card/70 px-4 py-1.5 font-display text-sm font-semibold tracking-wider text-cream uppercase transition hover:border-gold hover:text-gold"
-                >
-                  Sign up
-                </Link>
-              </div>
-            </Show>
-            <Show when="signed-in">
-              <div className="flex items-center pl-1">
-                <UserButton />
-              </div>
-            </Show>
-          </Suspense>
+          {user ? (
+            <div className="flex items-center gap-2 pl-1">
+              <span className="max-w-40 truncate font-display text-sm font-semibold tracking-wide text-cream uppercase">
+                {user.name}
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  void auth.signOut().then(() => {
+                    router.flushAll();
+                    void router.visit("/");
+                  });
+                }}
+                className="rounded-full border border-line-bright bg-card/70 px-4 py-1.5 font-display text-sm font-semibold tracking-wider text-cream uppercase transition hover:border-gold hover:text-gold"
+              >
+                Sign out
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 pl-1">
+              <Link
+                href="/login"
+                className="rounded-full bg-gold px-4 py-1.5 font-display text-sm font-bold tracking-wider text-field uppercase shadow-sm transition hover:bg-gold-bright"
+              >
+                Sign in
+              </Link>
+              <Link
+                href="/sign-up"
+                className="rounded-full border border-line-bright bg-card/70 px-4 py-1.5 font-display text-sm font-semibold tracking-wider text-cream uppercase transition hover:border-gold hover:text-gold"
+              >
+                Sign up
+              </Link>
+            </div>
+          )}
         </nav>
       </div>
     </header>

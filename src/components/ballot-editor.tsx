@@ -1,6 +1,5 @@
-"use client";
-
-import { useMemo, useState, useTransition } from "react";
+import { action } from "@void/react";
+import { useMemo, useState } from "react";
 import {
   DndContext,
   KeyboardSensor,
@@ -18,7 +17,6 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { saveBallot } from "@/app/actions";
 import {
   ApComparisonBadge,
   ConferenceBadge,
@@ -30,6 +28,23 @@ import { startingOrder, type Team } from "@/lib/poll";
 import { getTeamStyle } from "@/lib/team-meta";
 
 type TierSlice = "all" | "top25" | "26-50" | "51-100" | "101-end";
+
+function messageFromAction(error: { body: unknown }) {
+  const body = error.body;
+  if (
+    body &&
+    typeof body === "object" &&
+    "errors" in body &&
+    body.errors &&
+    typeof body.errors === "object"
+  ) {
+    const messages = Object.values(body.errors as Record<string, unknown>).filter(
+      (value): value is string => typeof value === "string" && value.length > 0,
+    );
+    if (messages.length > 0) return messages.join(". ");
+  }
+  return "Could not save the ballot.";
+}
 
 export function BallotEditor({
   teams,
@@ -54,7 +69,7 @@ export function BallotEditor({
   const [conference, setConference] = useState("");
   const [tierSlice, setTierSlice] = useState<TierSlice>("all");
   const [error, setError] = useState<string | null>(null);
-  const [pending, startTransition] = useTransition();
+  const [pending, setPending] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -88,8 +103,7 @@ export function BallotEditor({
       if (tierSlice === "51-100" && (rank < 51 || rank > 100)) return false;
       if (tierSlice === "101-end" && rank < 101) return false;
 
-      const matchesConference =
-        conference === "" || team.conference === conference;
+      const matchesConference = conference === "" || team.conference === conference;
       if (!matchesConference) return false;
 
       if (needle !== "") {
@@ -113,19 +127,13 @@ export function BallotEditor({
     const visibleIds = new Set(visible.map((team) => team.id));
     setOrder((full) => {
       const shown = full.filter((team) => visibleIds.has(team.id));
-      const oldIndex = shown.findIndex(
-        (team) => String(team.id) === String(active.id),
-      );
-      const newIndex = shown.findIndex(
-        (team) => String(team.id) === String(over.id),
-      );
+      const oldIndex = shown.findIndex((team) => String(team.id) === String(active.id));
+      const newIndex = shown.findIndex((team) => String(team.id) === String(over.id));
       if (oldIndex < 0 || newIndex < 0) return full;
 
       const nextShown = arrayMove(shown, oldIndex, newIndex);
       let cursor = 0;
-      return full.map((team) =>
-        visibleIds.has(team.id) ? nextShown[cursor++] : team,
-      );
+      return full.map((team) => (visibleIds.has(team.id) ? nextShown[cursor++] : team));
     });
   }
 
@@ -149,12 +157,21 @@ export function BallotEditor({
     setOrder(teams);
   }
 
-  function onSave() {
+  async function onSave() {
     setError(null);
-    startTransition(async () => {
-      const result = await saveBallot(order.map((team) => team.id), division);
-      if (result?.error) setError(result.error);
-    });
+    setPending(true);
+    try {
+      const teamIds = order.map((team) => team.id);
+      const result =
+        division === "FBS"
+          ? await action("/ballot", { data: { teamIds } })
+          : await action("/ballot/fcs", { data: { teamIds } });
+      if (!result.ok) setError(messageFromAction(result.error));
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Could not save the ballot.");
+    } finally {
+      setPending(false);
+    }
   }
 
   const topPick = order[0];
@@ -202,9 +219,7 @@ export function BallotEditor({
             <p className="font-display text-xs font-semibold tracking-wider text-muted uppercase">
               Quick Presets
             </p>
-            <p className="mt-0.5 text-xs text-muted">
-              Re-seed or undo edits
-            </p>
+            <p className="mt-0.5 text-xs text-muted">Re-seed or undo edits</p>
           </div>
           <div className="flex items-center gap-1.5">
             {isDirty ? (
@@ -292,7 +307,8 @@ export function BallotEditor({
           </div>
 
           <p className="text-xs text-muted">
-            Showing {visible.length} of {order.length}. A filter only hides teams. Drag a row or type a rank to move it. Rank 1 is the best team.
+            Showing {visible.length} of {order.length}. A filter only hides teams. Drag a row or
+            type a rank to move it. Rank 1 is the best team.
           </p>
         </div>
 
@@ -307,11 +323,7 @@ export function BallotEditor({
       </div>
 
       {/* Sortable Ballot List */}
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={onDragEnd}
-      >
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
         <SortableContext
           items={visible.map((team) => String(team.id))}
           strategy={verticalListSortingStrategy}
@@ -365,14 +377,7 @@ function SortableTeam({
   onMove: (teamId: number, rank: number) => void;
 }) {
   const profile = DIVISION_PROFILES[division];
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: String(team.id),
   });
 
@@ -501,13 +506,7 @@ function SortableTeam({
 
 function GripIcon() {
   return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 16 16"
-      aria-hidden="true"
-      fill="currentColor"
-    >
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="currentColor">
       <circle cx="5" cy="3" r="1.2" />
       <circle cx="11" cy="3" r="1.2" />
       <circle cx="5" cy="8" r="1.2" />

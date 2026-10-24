@@ -1,12 +1,17 @@
-import Link from "next/link";
-import { Suspense } from "react";
-import { connection } from "next/server";
 import { PollBoard } from "@/components/poll-board";
-import { pollStandings } from "@/lib/db";
 import { DIVISION_PROFILES, type Division } from "@/lib/division";
-import { type Standing } from "@/lib/poll";
+import type { Standing } from "@/lib/poll";
+import { Link } from "@void/react";
 
-export function DivisionHome({ division }: { division: Division }) {
+export function DivisionHome({
+  division,
+  standings,
+  error,
+}: {
+  division: Division;
+  standings: Standing[];
+  error: string | null;
+}) {
   const profile = DIVISION_PROFILES[division];
 
   return (
@@ -47,43 +52,15 @@ export function DivisionHome({ division }: { division: Division }) {
         </div>
       </section>
 
-      <Suspense
-        fallback={
-          <div className="flex flex-col gap-4 rounded-2xl border border-line bg-card p-8 text-center">
-            <p className="font-display text-xl tracking-wider text-gold uppercase">
-              Loading the poll…
-            </p>
-            <p className="text-sm text-muted">{profile.loading}</p>
-          </div>
-        }
-      >
-        <Standings division={division} />
-      </Suspense>
+      {error ? (
+        <div role="alert" className="rounded-2xl border border-gold/40 bg-card p-6 text-gold">
+          Could not load the {profile.name} poll. {error}
+        </div>
+      ) : standings.length === 0 ? (
+        <p className="text-muted">No {profile.name} teams are in the poll yet.</p>
+      ) : (
+        <PollBoard standings={standings} division={division} />
+      )}
     </main>
   );
-}
-
-async function Standings({ division }: { division: Division }) {
-  await connection();
-  const profile = DIVISION_PROFILES[division];
-  let standings: Standing[];
-  try {
-    standings = await pollStandings(division);
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown database error";
-    return (
-      <div
-        role="alert"
-        className="rounded-2xl border border-gold/40 bg-card p-6 text-gold"
-      >
-        Could not load the {profile.name} poll. {message}
-      </div>
-    );
-  }
-
-  if (standings.length === 0) {
-    return <p className="text-muted">No {profile.name} teams are in the poll yet.</p>;
-  }
-
-  return <PollBoard standings={standings} division={division} />;
 }
