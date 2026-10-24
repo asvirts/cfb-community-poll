@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { connection } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { pollStandings } from "@/lib/db";
 import type { Standing } from "@/lib/poll";
 
 export default function HomePage() {
@@ -22,47 +22,18 @@ export default function HomePage() {
 
 async function Standings() {
   await connection();
-  const supabase = await createClient();
-  const { data, error } = await supabase.rpc("poll_standings");
-
-  // #region agent log
-  fetch("http://127.0.0.1:7933/ingest/3dcd5539-b183-4df0-9335-9ff526c6cf8e", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "85283f" },
-    body: JSON.stringify({
-      sessionId: "85283f",
-      runId: "pre-fix",
-      hypothesisId: "A-E",
-      location: "src/app/page.tsx:26",
-      message: "poll_standings rpc result",
-      data: {
-        host: (() => {
-          try {
-            return new URL(process.env.NEXT_PUBLIC_SUPABASE_URL ?? "").host;
-          } catch {
-            return "invalid-url";
-          }
-        })(),
-        errorCode: error?.code ?? null,
-        errorMessage: error?.message ?? null,
-        errorHint: error?.hint ?? null,
-        errorDetails: error?.details ?? null,
-        rowCount: Array.isArray(data) ? data.length : null,
-      },
-      timestamp: Date.now(),
-    }),
-  }).catch(() => {});
-  // #endregion
-
-  if (error) {
+  let standings: Standing[];
+  try {
+    standings = await pollStandings();
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown database error";
     return (
       <p role="alert" className="text-gold">
-        Could not load the poll. {error.message}
+        Could not load the poll. {message}
       </p>
     );
   }
 
-  const standings = asStandings(data);
   const ballotCount = standings[0]?.ballot_count ?? 0;
 
   if (standings.length === 0) {
@@ -130,20 +101,4 @@ async function Standings() {
       </div>
     </div>
   );
-}
-
-function asStandings(data: unknown): Standing[] {
-  if (!Array.isArray(data)) return [];
-
-  return data.map((row) => {
-    const item = row as Record<string, unknown>;
-    return {
-      team_id: Number(item.team_id),
-      name: String(item.name ?? ""),
-      conference: String(item.conference ?? ""),
-      points: Number(item.points ?? 0),
-      first_place_votes: Number(item.first_place_votes ?? 0),
-      ballot_count: Number(item.ballot_count ?? 0),
-    };
-  });
 }

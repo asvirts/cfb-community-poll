@@ -2,8 +2,9 @@ import { Suspense } from "react";
 import { connection } from "next/server";
 import { redirect } from "next/navigation";
 import { BallotEditor } from "@/components/ballot-editor";
-import { alphabeticalTeams, orderTeams, type Pick, type Team } from "@/lib/poll";
-import { createClient } from "@/lib/supabase/server";
+import { currentUser } from "@/lib/auth";
+import { listBallotPicks, listTeams } from "@/lib/db";
+import { alphabeticalTeams, orderTeams } from "@/lib/poll";
 
 export default function BallotPage() {
   return (
@@ -23,67 +24,35 @@ export default function BallotPage() {
 
 async function BallotLoader() {
   await connection();
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user;
+  try {
+    user = await currentUser();
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown database error";
+    return (
+      <p role="alert" className="text-gold">
+        Could not load your ballot. {message}
+      </p>
+    );
+  }
 
   if (!user) {
     redirect("/login");
   }
 
-  const { data: teamsData, error: teamsError } = await supabase
-    .from("teams")
-    .select("id, name, conference");
-
-  if (teamsError) {
+  let ordered;
+  try {
+    const teams = await listTeams();
+    const picks = await listBallotPicks(user.id);
+    ordered = picks.length > 0 ? orderTeams(teams, picks) : alphabeticalTeams(teams);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown database error";
     return (
       <p role="alert" className="text-gold">
-        Could not load teams. {teamsError.message}
+        Could not load your ballot. {message}
       </p>
     );
   }
-
-  const teams = asTeams(teamsData);
-  const { data: ballot, error: ballotError } = await supabase
-    .from("ballots")
-    .select("ballot_picks(team_id, rank)")
-    .eq("user_id", user.id)
-    .maybeSingle();
-
-  if (ballotError) {
-    return (
-      <p role="alert" className="text-gold">
-        Could not load your ballot. {ballotError.message}
-      </p>
-    );
-  }
-
-  const picks = asPicks(ballot?.ballot_picks);
-  const ordered = picks.length > 0 ? orderTeams(teams, picks) : alphabeticalTeams(teams);
 
   return <BallotEditor key={user.id} userId={user.id} teams={ordered} />;
-}
-
-function asTeams(data: unknown): Team[] {
-  if (!Array.isArray(data)) return [];
-  return data.map((row) => {
-    const item = row as Record<string, unknown>;
-    return {
-      id: Number(item.id),
-      name: String(item.name ?? ""),
-      conference: String(item.conference ?? ""),
-    };
-  });
-}
-
-function asPicks(data: unknown): Pick[] {
-  if (!Array.isArray(data)) return [];
-  return data.map((row) => {
-    const item = row as Record<string, unknown>;
-    return {
-      team_id: Number(item.team_id),
-      rank: Number(item.rank),
-    };
-  });
 }

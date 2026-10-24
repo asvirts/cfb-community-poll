@@ -1,14 +1,11 @@
 import Link from "next/link";
 import { connection } from "next/server";
 import { signOut } from "@/app/actions";
-import { createClient } from "@/lib/supabase/server";
+import { currentUser } from "@/lib/auth";
 
 export async function SiteHeader() {
   await connection();
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await currentUser().catch(() => null);
 
   return (
     <header className="sticky top-0 z-20 border-b border-line bg-field/95 backdrop-blur">

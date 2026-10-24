@@ -1,6 +1,8 @@
 import { Suspense } from "react";
 import { connection } from "next/server";
+import { redirect } from "next/navigation";
 import { signIn, signUp } from "@/app/actions";
+import { currentUser } from "@/lib/auth";
 
 export default function LoginPage({
   searchParams,
@@ -14,6 +16,7 @@ export default function LoginPage({
         <p className="text-muted">Use an email and password. One account, one full FBS ballot.</p>
       </div>
       <Suspense fallback={null}>
+        <SignedInRedirect />
         <LoginNotice searchParams={searchParams} />
       </Suspense>
       <form action={signIn} className="flex flex-col gap-4">
@@ -51,6 +54,13 @@ export default function LoginPage({
       </form>
     </main>
   );
+}
+
+async function SignedInRedirect() {
+  await connection();
+  const user = await currentUser().catch(() => null);
+  if (user) redirect("/ballot");
+  return null;
 }
 
 async function LoginNotice({
