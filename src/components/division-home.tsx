@@ -1,7 +1,8 @@
+import { Link } from "@void/react";
+
 import { PollBoard } from "@/components/poll-board";
 import { DIVISION_PROFILES, type Division } from "@/lib/division";
 import type { Standing } from "@/lib/poll";
-import { Link } from "@void/react";
 
 export function DivisionHome({
   division,

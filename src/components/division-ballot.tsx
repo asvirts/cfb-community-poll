@@ -1,7 +1,8 @@
+import { Link } from "@void/react";
+
 import { BallotEditor } from "@/components/ballot-editor";
 import { DIVISION_PROFILES, type Division } from "@/lib/division";
 import type { Team } from "@/lib/poll";
-import { Link } from "@void/react";
 
 export function DivisionBallot({
   division,

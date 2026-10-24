@@ -1,6 +1,7 @@
+import { defineHandler, type InferProps } from "void";
+
 import { pollStandings } from "@/lib/db";
 import type { Standing } from "@/lib/poll";
-import { defineHandler, type InferProps } from "void";
 
 export type Props = InferProps<typeof loader>;
 

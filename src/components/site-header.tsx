@@ -1,6 +1,7 @@
-import { DIVISION_PROFILES } from "@/lib/division";
 import { Link, useRouter, useShared } from "@void/react";
 import { auth } from "void/client";
+
+import { DIVISION_PROFILES } from "@/lib/division";
 
 export function SiteHeader() {
   const router = useRouter();
@@ -21,7 +22,7 @@ export function SiteHeader() {
             <span className="font-semibold text-cream">{profile.seasonLabel}</span>
             <span className="text-line-bright">•</span>
             <span>{profile.programsLabel}</span>
-            <span className="hidden sm:inline text-line-bright">•</span>
+            <span className="hidden text-line-bright sm:inline">•</span>
             <span className="hidden sm:inline">{profile.scoringLabel}</span>
           </div>
           <div className="font-mono text-gold/90">Baseline: {profile.pollTitle} Top 25</div>
@@ -57,7 +58,7 @@ export function SiteHeader() {
             </svg>
           </div>
           <div className="flex flex-col">
-            <span className="font-display text-2xl leading-none font-bold tracking-wide text-cream uppercase group-hover:text-gold transition-colors">
+            <span className="font-display text-2xl leading-none font-bold tracking-wide text-cream uppercase transition-colors group-hover:text-gold">
               CFB Community Poll
             </span>
             <span className="text-[11px] font-medium tracking-widest text-muted uppercase">

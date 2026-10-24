@@ -1,10 +1,11 @@
-import tailwindcss from "@tailwindcss/vite";
-import { voidReact } from "@void/react/plugin";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath, URL } from "node:url";
-import { voidPlugin } from "void";
+
+import tailwindcss from "@tailwindcss/vite";
+import { voidReact } from "@void/react/plugin";
 import { defineConfig } from "vite-plus";
+import { voidPlugin } from "void";
 
 function cloudflareDeployPointer() {
   return {
@@ -44,10 +45,32 @@ export default defineConfig(() => {
         "@": fileURLToPath(new URL("./src", import.meta.url)),
       },
     },
+    test: {
+      include: ["src/**/*.test.ts"],
+    },
+    fmt: {
+      ignorePatterns: [
+        "dist/**",
+        ".void/**",
+        ".wrangler/**",
+        "db/migrations/**",
+        "package-lock.json",
+        "void.lock.json",
+      ],
+      sortImports: true,
+      sortTailwindcss: {
+        stylesheet: "./src/styles/globals.css",
+      },
+    },
     lint: {
+      ignorePatterns: ["dist/**", ".void/**", ".wrangler/**"],
+      plugins: ["eslint", "typescript", "unicorn", "oxc", "react", "jsx-a11y", "import", "vitest"],
       options: {
         typeAware: true,
         typeCheck: true,
+      },
+      rules: {
+        "jsx-a11y/control-has-associated-label": ["warn", { depth: 5 }],
       },
     },
   };

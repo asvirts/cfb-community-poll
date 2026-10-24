@@ -1,5 +1,5 @@
-import { FCS_TEAMS } from "@/lib/fcs-teams";
 import { FBS_TEAMS } from "@/lib/fbs-teams";
+import { FCS_TEAMS } from "@/lib/fcs-teams";
 
 export function teamSeedRows() {
   return [

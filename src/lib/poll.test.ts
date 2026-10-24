@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
+
 import { orderTeams, scoreStandings, startingOrder, validateBallot, type Team } from "./poll";
 
 const teams: Team[] = [

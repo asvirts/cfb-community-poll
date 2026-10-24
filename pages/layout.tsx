@@ -1,5 +1,7 @@
-import { SiteHeader } from "@/components/site-header";
 import { Link } from "@void/react";
+
+import { SiteHeader } from "@/components/site-header";
+
 import "../src/styles/globals.css";
 
 export default function Layout({ children }: { children: React.ReactNode }) {

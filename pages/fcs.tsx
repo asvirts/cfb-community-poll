@@ -1,4 +1,5 @@
 import { DivisionHome } from "@/components/division-home";
+
 import type { Props } from "./fcs.server";
 
 export default function FcsPage({ standings, error }: Props) {

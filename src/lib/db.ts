@@ -1,4 +1,6 @@
 import { ballots, ballotPicks, teams } from "@schema";
+import { and, db, eq } from "void/db";
+
 import { DIVISION_PROFILES, type Division } from "@/lib/division";
 import {
   orderTeams,
@@ -10,7 +12,6 @@ import {
   type Team,
 } from "@/lib/poll";
 import { teamSeedRows } from "@/lib/team-seed";
-import { and, db, eq } from "void/db";
 
 export class BallotError extends Error {}
 

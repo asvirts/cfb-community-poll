@@ -1,4 +1,5 @@
 import { defineSeed } from "void/seed";
+
 import { teamSeedRows } from "../src/lib/team-seed";
 
 const CHUNK = 30;

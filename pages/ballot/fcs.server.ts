@@ -1,10 +1,11 @@
+import { defineHandler, type InferProps } from "void";
+import { requireAuth } from "void/auth";
+import { ValidationError } from "void/handler";
+
 import { ballotBodySchema } from "@/lib/ballot-schema";
 import { BallotError, loadOrderedBallot, saveBallotForUser } from "@/lib/db";
 import { DIVISION_PROFILES } from "@/lib/division";
 import type { Team } from "@/lib/poll";
-import { defineHandler, type InferProps } from "void";
-import { ValidationError } from "void/handler";
-import { requireAuth } from "void/auth";
 
 export type Props = InferProps<typeof loader>;
 

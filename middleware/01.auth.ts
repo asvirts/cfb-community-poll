@@ -1,5 +1,5 @@
-import { getUser, type AuthUser } from "void/auth";
 import { defineMiddleware } from "void";
+import { getUser, type AuthUser } from "void/auth";
 
 declare module "void" {
   interface CloudContextVariables {

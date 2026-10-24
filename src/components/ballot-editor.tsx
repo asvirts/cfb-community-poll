@@ -1,5 +1,3 @@
-import { action } from "@void/react";
-import { useMemo, useState } from "react";
 import {
   DndContext,
   KeyboardSensor,
@@ -17,6 +15,9 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { action } from "@void/react";
+import { useMemo, useState } from "react";
+
 import {
   ApComparisonBadge,
   ConferenceBadge,
@@ -251,7 +252,7 @@ export function BallotEditor({
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search by name"
-              className="rounded-xl border border-line bg-field px-3.5 py-2 text-sm font-normal text-cream normal-case outline-none transition focus:border-gold"
+              className="rounded-xl border border-line bg-field px-3.5 py-2 text-sm font-normal text-cream normal-case transition outline-none focus:border-gold"
             />
           </label>
           <label className="flex flex-col gap-1 text-xs font-semibold tracking-wider text-muted uppercase">
@@ -259,7 +260,7 @@ export function BallotEditor({
             <select
               value={conference}
               onChange={(event) => setConference(event.target.value)}
-              className="rounded-xl border border-line bg-field px-3.5 py-2 text-sm font-normal text-cream normal-case outline-none transition focus:border-gold"
+              className="rounded-xl border border-line bg-field px-3.5 py-2 text-sm font-normal text-cream normal-case transition outline-none focus:border-gold"
             >
               <option value="">All conferences</option>
               {conferences.map((name) => (
@@ -435,7 +436,7 @@ function SortableTeam({
               commit(event.currentTarget.value);
             }
           }}
-          className="w-16 shrink-0 rounded-lg border border-line bg-field px-2 py-1.5 text-center font-display text-xl font-bold text-gold tabular-nums outline-none transition focus:border-gold"
+          className="w-16 shrink-0 rounded-lg border border-line bg-field px-2 py-1.5 text-center font-display text-xl font-bold text-gold tabular-nums transition outline-none focus:border-gold"
         />
 
         <TeamCrest name={team.name} size="sm" />
@@ -453,7 +454,7 @@ function SortableTeam({
           </div>
           <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-muted">
             <span className="hidden sm:inline">{style.mascot}</span>
-            <span className="hidden sm:inline text-line-bright">•</span>
+            <span className="hidden text-line-bright sm:inline">•</span>
             <span>{team.conference}</span>
           </div>
         </div>
@@ -461,7 +462,7 @@ function SortableTeam({
 
       {/* Right side metadata + quick nudge buttons */}
       <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-        <div className="hidden md:flex items-center gap-2">
+        <div className="hidden items-center gap-2 md:flex">
           <ConferenceBadge conference={team.conference} />
           <ApComparisonBadge
             teamName={team.name}
@@ -473,7 +474,7 @@ function SortableTeam({
           />
         </div>
 
-        <span className="hidden sm:inline-block w-16 text-right font-mono text-xs text-muted tabular-nums">
+        <span className="hidden w-16 text-right font-mono text-xs text-muted tabular-nums sm:inline-block">
           {pointsValue} {pointsValue === 1 ? "pt" : "pts"}
         </span>
 

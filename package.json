@@ -8,6 +8,10 @@
     "build": "vp build",
     "preview": "vp preview",
     "check": "vp check",
+    "lint": "vp lint",
+    "lint:fix": "vp lint --fix",
+    "fmt": "vp fmt",
+    "fmt:check": "vp fmt --check",
     "test": "vp test",
     "deploy": "void deploy",
     "postinstall": "void prepare"

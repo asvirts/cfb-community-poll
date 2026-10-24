@@ -1,5 +1,6 @@
 import { Link } from "@void/react";
 import { useMemo, useState } from "react";
+
 import {
   ApComparisonBadge,
   ConferenceBadge,
@@ -283,7 +284,7 @@ export function PollBoard({ standings, division }: { standings: Standing[]; divi
               >
                 {/* Top team color bar */}
                 <div
-                  className=" inset-x-0 top-0 h-1.5 w-full rounded-full mb-3"
+                  className="inset-x-0 top-0 mb-3 h-1.5 w-full rounded-full"
                   style={{
                     background: `linear-gradient(90deg, ${style.primary}, ${style.secondary})`,
                   }}
@@ -385,7 +386,7 @@ export function PollBoard({ standings, division }: { standings: Standing[]; divi
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search team, mascot, or conference…"
                 aria-label="Search teams in standings"
-                className="w-full rounded-xl border border-line bg-field px-3.5 py-2 text-sm text-cream placeholder:text-muted/70 outline-none transition focus:border-gold"
+                className="w-full rounded-xl border border-line bg-field px-3.5 py-2 text-sm text-cream transition outline-none placeholder:text-muted/70 focus:border-gold"
               />
               {query ? (
                 <button
@@ -402,7 +403,7 @@ export function PollBoard({ standings, division }: { standings: Standing[]; divi
               value={selectedConference}
               onChange={(e) => setSelectedConference(e.target.value)}
               aria-label="Filter standings by conference"
-              className="rounded-xl border border-line bg-field px-3.5 py-2 text-sm text-cream outline-none transition focus:border-gold"
+              className="rounded-xl border border-line bg-field px-3.5 py-2 text-sm text-cream transition outline-none focus:border-gold"
             >
               <option value="">All Conferences ({teamCount})</option>
               {conferences.map((conf) => (
@@ -415,7 +416,7 @@ export function PollBoard({ standings, division }: { standings: Standing[]; divi
         </div>
 
         {/* Conference Quick-Filter Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 pt-0.5">
+        <div className="flex items-center gap-1.5 overflow-x-auto pt-0.5 pb-1">
           <button
             type="button"
             onClick={() => setSelectedConference("")}
@@ -706,7 +707,7 @@ function TeamRowGroup({
           <>
             <td className="px-4 py-3 text-right">
               <div className="inline-flex flex-col items-end gap-1">
-                <span className="font-mono text-sm font-semibold tabular-nums text-cream">
+                <span className="font-mono text-sm font-semibold text-cream tabular-nums">
                   {team.points.toLocaleString()}
                 </span>
                 <div className="h-1.5 w-24 overflow-hidden rounded-full bg-field">
@@ -717,7 +718,7 @@ function TeamRowGroup({
                 </div>
               </div>
             </td>
-            <td className="px-4 py-3 text-right font-mono text-xs tabular-nums text-muted">
+            <td className="px-4 py-3 text-right font-mono text-xs text-muted tabular-nums">
               #{avgRank.toFixed(1)}
             </td>
             <td className="px-4 py-3 text-right font-mono text-sm tabular-nums">
@@ -731,7 +732,7 @@ function TeamRowGroup({
             </td>
           </>
         ) : (
-          <td className="px-4 py-3 text-right font-mono text-xs tabular-nums text-muted">
+          <td className="px-4 py-3 text-right font-mono text-xs text-muted tabular-nums">
             {teamCount - rank + 1} pts
           </td>
         )}
