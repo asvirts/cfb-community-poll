@@ -12,7 +12,7 @@ export default function SignUpPage() {
           Claim Your Ballot
         </h1>
         <p className="max-w-md text-sm text-muted">
-          One verified ballot per fan. Rank every FBS team from #1 to #136.
+          One verified ballot per subdivision. Rank every FBS team, then rank every FCS team on its own board.
         </p>
       </div>
       <Suspense fallback={<p className="text-muted">Loading sign up…</p>}>

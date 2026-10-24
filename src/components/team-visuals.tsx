@@ -76,18 +76,25 @@ export function ApComparisonBadge({
   teamName,
   communityRank,
   hasBallots = true,
+  pollShort = "AP",
+  pollTitle = "Oct. 18 AP Poll",
+  seed = AP_TOP_25,
 }: {
   teamName: string;
   communityRank: number;
   hasBallots?: boolean;
+  pollShort?: string;
+  pollTitle?: string;
+  seed?: readonly string[];
 }) {
-  const apRank = getApRank(teamName);
+  const seedIndex = seed.indexOf(teamName);
+  const seedRank = seedIndex >= 0 ? seedIndex + 1 : null;
 
   if (!hasBallots) {
-    if (apRank !== null) {
+    if (seedRank !== null) {
       return (
         <span className="inline-flex items-center gap-1 rounded border border-gold/35 bg-gold/10 px-1.5 py-0.5 font-mono text-[11px] font-medium text-gold">
-          AP #{apRank}
+          {pollShort} #{seedRank}
         </span>
       );
     }
@@ -98,32 +105,32 @@ export function ApComparisonBadge({
     );
   }
 
-  if (apRank === null) {
+  if (seedRank === null) {
     if (communityRank <= 25) {
       return (
         <span
-          title="Unranked in Oct. 18 AP Poll"
+          title={`Unranked in ${pollTitle}`}
           className="inline-flex items-center gap-1 rounded border border-emerald-400/35 bg-emerald-500/12 px-1.5 py-0.5 font-mono text-[11px] font-medium text-emerald-300"
         >
-          ★ NR in AP
+          ★ NR in {pollShort}
         </span>
       );
     }
     return (
       <span className="inline-flex items-center rounded border border-line/60 bg-field/40 px-1.5 py-0.5 font-mono text-[11px] text-muted/75">
-        AP NR
+        {pollShort} NR
       </span>
     );
   }
 
-  const delta = apRank - communityRank;
+  const delta = seedRank - communityRank;
   if (delta === 0) {
     return (
       <span
-        title={`Matches AP #${apRank}`}
+        title={`Matches ${pollShort} #${seedRank}`}
         className="inline-flex items-center gap-1 rounded border border-line bg-field/70 px-1.5 py-0.5 font-mono text-[11px] text-muted"
       >
-        = AP #{apRank}
+        = {pollShort} #{seedRank}
       </span>
     );
   }
@@ -131,36 +138,48 @@ export function ApComparisonBadge({
   if (delta > 0) {
     return (
       <span
-        title={`Ranked ${delta} spots higher than AP #${apRank}`}
+        title={`Ranked ${delta} spots higher than ${pollShort} #${seedRank}`}
         className="inline-flex items-center gap-1 rounded border border-emerald-400/35 bg-emerald-500/12 px-1.5 py-0.5 font-mono text-[11px] font-medium text-emerald-300"
       >
-        ▲{delta} <span className="text-emerald-200/70">AP #{apRank}</span>
+        ▲{delta} <span className="text-emerald-200/70">{pollShort} #{seedRank}</span>
       </span>
     );
   }
 
   return (
     <span
-      title={`Ranked ${Math.abs(delta)} spots lower than AP #${apRank}`}
+      title={`Ranked ${Math.abs(delta)} spots lower than ${pollShort} #${seedRank}`}
       className="inline-flex items-center gap-1 rounded border border-amber-400/35 bg-amber-500/12 px-1.5 py-0.5 font-mono text-[11px] font-medium text-amber-300"
     >
-      ▼{Math.abs(delta)} <span className="text-amber-200/70">AP #{apRank}</span>
+      ▼{Math.abs(delta)} <span className="text-amber-200/70">{pollShort} #{seedRank}</span>
     </span>
   );
 }
 
-export function RankTierPill({ rank }: { rank: number }) {
-  if (rank <= 4) {
+export function RankTierPill({
+  rank,
+  byeRank = 4,
+  playoffRank = 12,
+  byeLabel = "CFP Bye",
+  fieldLabel = "CFP Top 12",
+}: {
+  rank: number;
+  byeRank?: number;
+  playoffRank?: number;
+  byeLabel?: string;
+  fieldLabel?: string;
+}) {
+  if (rank <= byeRank) {
     return (
       <span className="inline-flex items-center rounded bg-gold/20 px-1.5 py-0.5 font-display text-[10px] font-bold tracking-widest text-gold uppercase ring-1 ring-gold/40">
-        CFP Bye
+        {byeLabel}
       </span>
     );
   }
-  if (rank <= 12) {
+  if (rank <= playoffRank) {
     return (
       <span className="inline-flex items-center rounded bg-emerald-500/15 px-1.5 py-0.5 font-display text-[10px] font-bold tracking-widest text-emerald-300 uppercase ring-1 ring-emerald-400/35">
-        CFP Top 12
+        {fieldLabel}
       </span>
     );
   }

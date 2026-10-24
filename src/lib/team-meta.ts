@@ -1,3 +1,5 @@
+import { FCS_TEAM_STYLES } from "@/lib/fcs-teams";
+
 export type ConferenceMeta = {
   id: string;
   short: string;
@@ -102,11 +104,128 @@ export const CONFERENCE_META: Record<string, ConferenceMeta> = {
   Independent: {
     id: "Independent",
     short: "IND",
-    label: "FBS Independent",
+    label: "Independent",
     tier: "Independent",
     accent: "#e2b657",
     bg: "rgba(226, 182, 87, 0.12)",
     border: "rgba(226, 182, 87, 0.35)",
+  },
+  "Big Sky": {
+    id: "Big Sky",
+    short: "SKY",
+    label: "Big Sky Conference",
+    tier: "Group",
+    accent: "#60a5fa",
+    bg: "rgba(96, 165, 250, 0.12)",
+    border: "rgba(96, 165, 250, 0.35)",
+  },
+  CAA: {
+    id: "CAA",
+    short: "CAA",
+    label: "Coastal Athletic Association",
+    tier: "Group",
+    accent: "#38bdf8",
+    bg: "rgba(56, 189, 248, 0.12)",
+    border: "rgba(56, 189, 248, 0.35)",
+  },
+  Ivy: {
+    id: "Ivy",
+    short: "IVY",
+    label: "Ivy League",
+    tier: "Group",
+    accent: "#4ade80",
+    bg: "rgba(74, 222, 128, 0.12)",
+    border: "rgba(74, 222, 128, 0.35)",
+  },
+  MEAC: {
+    id: "MEAC",
+    short: "MEAC",
+    label: "Mid-Eastern Athletic Conference",
+    tier: "Group",
+    accent: "#c084fc",
+    bg: "rgba(192, 132, 252, 0.12)",
+    border: "rgba(192, 132, 252, 0.35)",
+  },
+  MVFC: {
+    id: "MVFC",
+    short: "MVFC",
+    label: "Missouri Valley Football Conference",
+    tier: "Group",
+    accent: "#fb923c",
+    bg: "rgba(251, 146, 60, 0.12)",
+    border: "rgba(251, 146, 60, 0.35)",
+  },
+  NEC: {
+    id: "NEC",
+    short: "NEC",
+    label: "Northeast Conference",
+    tier: "Group",
+    accent: "#22d3ee",
+    bg: "rgba(34, 211, 238, 0.12)",
+    border: "rgba(34, 211, 238, 0.35)",
+  },
+  OVC: {
+    id: "OVC",
+    short: "OVC",
+    label: "Ohio Valley Conference",
+    tier: "Group",
+    accent: "#fbbf24",
+    bg: "rgba(251, 191, 36, 0.12)",
+    border: "rgba(251, 191, 36, 0.35)",
+  },
+  Patriot: {
+    id: "Patriot",
+    short: "PAT",
+    label: "Patriot League",
+    tier: "Group",
+    accent: "#93c5fd",
+    bg: "rgba(147, 197, 253, 0.12)",
+    border: "rgba(147, 197, 253, 0.35)",
+  },
+  Pioneer: {
+    id: "Pioneer",
+    short: "PIO",
+    label: "Pioneer Football League",
+    tier: "Group",
+    accent: "#a3e635",
+    bg: "rgba(163, 230, 53, 0.12)",
+    border: "rgba(163, 230, 53, 0.35)",
+  },
+  SoCon: {
+    id: "SoCon",
+    short: "SOC",
+    label: "Southern Conference",
+    tier: "Group",
+    accent: "#fb7185",
+    bg: "rgba(251, 113, 133, 0.12)",
+    border: "rgba(251, 113, 133, 0.35)",
+  },
+  Southland: {
+    id: "Southland",
+    short: "SLC",
+    label: "Southland Conference",
+    tier: "Group",
+    accent: "#fdba74",
+    bg: "rgba(253, 186, 116, 0.12)",
+    border: "rgba(253, 186, 116, 0.35)",
+  },
+  SWAC: {
+    id: "SWAC",
+    short: "SWAC",
+    label: "Southwestern Athletic Conference",
+    tier: "Group",
+    accent: "#facc15",
+    bg: "rgba(250, 204, 21, 0.12)",
+    border: "rgba(250, 204, 21, 0.35)",
+  },
+  UAC: {
+    id: "UAC",
+    short: "UAC",
+    label: "United Athletic Conference",
+    tier: "Group",
+    accent: "#2dd4bf",
+    bg: "rgba(45, 212, 191, 0.12)",
+    border: "rgba(45, 212, 191, 0.35)",
   },
 };
 
@@ -260,8 +379,9 @@ export const TEAM_STYLES: Record<string, TeamStyle> = {
 
 export function getTeamStyle(name: string): TeamStyle {
   return (
-    TEAM_STYLES[name] ?? {
-      mascot: "FBS Program",
+    TEAM_STYLES[name] ??
+    FCS_TEAM_STYLES[name] ?? {
+      mascot: "Program",
       abbrev: name.slice(0, 3).toUpperCase(),
       primary: "#e2b657",
       secondary: "#1b2418",

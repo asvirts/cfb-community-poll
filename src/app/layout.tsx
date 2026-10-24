@@ -25,9 +25,9 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CFB Community Poll — All 136 FBS Programs Ranked by Fans",
+  title: "CFB Community Poll — FBS and FCS Ranked by Fans",
   description:
-    "Every FBS college football program from #1 to #136, ranked by the fans. One ballot per person, Borda count scoring.",
+    "Separate fan polls for every FBS and FCS college football program. One ballot per subdivision, Borda count scoring.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -54,16 +54,20 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                       CFB Community Poll
                     </span>
                     <span className="rounded border border-line px-1.5 py-0.5 font-mono text-[10px] text-muted">
-                      136 FBS TEAMS
+                      FBS + FCS
                     </span>
                   </div>
                   <p className="max-w-xl text-xs leading-relaxed text-muted">
-                    Every signed-in fan submits a full 1–136 ballot. Rank #1 awards 136 points down to 1 point for #136. Ties break by first-place votes, then alphabetical order.
+                    Each signed-in fan submits one full ballot per subdivision. FBS rank #1 awards 138 points. FCS rank #1 awards 128. Ties break by first-place votes, then alphabetical order.
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-4 text-xs text-muted">
                   <Link href="/" className="hover:text-gold transition-colors">
-                    Live Standings
+                    FBS Standings
+                  </Link>
+                  <span className="text-line-bright">•</span>
+                  <Link href="/fcs" className="hover:text-gold transition-colors">
+                    FCS Standings
                   </Link>
                   <span className="text-line-bright">•</span>
                   <Link href="/ballot" className="hover:text-gold transition-colors">
@@ -71,7 +75,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                   </Link>
                   <span className="text-line-bright">•</span>
                   <span className="font-mono text-[11px] text-muted/80">
-                    Seeded with Oct. 18 AP Top 25
+                    FBS seed: Oct. 18 AP • FCS seed: Oct. 19 Stats Perform
                   </span>
                 </div>
               </div>

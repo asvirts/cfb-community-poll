@@ -67,8 +67,40 @@ export const AP_TOP_25 = [
   "Arizona",
 ] as const;
 
-export function startingOrder<T extends { name: string }>(teams: T[]): T[] {
-  const rank = new Map<string, number>(AP_TOP_25.map((name, index) => [name, index]));
+/** Stats Perform FCS Top 25 released Oct. 19, 2026, after Week 7. */
+export const FCS_TOP_25 = [
+  "Tarleton State",
+  "Stephen F. Austin",
+  "Montana State",
+  "Youngstown State",
+  "South Dakota State",
+  "North Dakota",
+  "Northern Arizona",
+  "South Dakota",
+  "Austin Peay",
+  "Illinois State",
+  "Lehigh",
+  "Tennessee Tech",
+  "Campbell",
+  "Montana",
+  "Harvard",
+  "Lamar",
+  "Mercer",
+  "East Tennessee State",
+  "Monmouth",
+  "UC Davis",
+  "Northern Iowa",
+  "Weber State",
+  "Southeastern Louisiana",
+  "Jackson State",
+  "Richmond",
+] as const;
+
+export function startingOrder<T extends { name: string }>(
+  teams: T[],
+  seed: readonly string[] = AP_TOP_25,
+): T[] {
+  const rank = new Map<string, number>(seed.map((name, index) => [name, index]));
   return [...teams].sort((a, b) => {
     const aRank = rank.get(a.name);
     const bRank = rank.get(b.name);

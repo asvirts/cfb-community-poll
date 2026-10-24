@@ -4,11 +4,14 @@ import { Show, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Suspense } from "react";
+import { DIVISION_PROFILES } from "@/lib/division";
 
 export function SiteHeader() {
   const pathname = usePathname();
-  const isPoll = pathname === "/";
-  const isBallot = pathname?.startsWith("/ballot");
+  const isFcs = pathname === "/fcs" || pathname?.startsWith("/ballot/fcs");
+  const profile = DIVISION_PROFILES[isFcs ? "FCS" : "FBS"];
+  const isPoll = pathname === profile.standingsHref;
+  const isBallot = pathname === profile.ballotHref;
 
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-field/90 backdrop-blur-md">
@@ -17,22 +20,22 @@ export function SiteHeader() {
         <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-2 text-[11px] tracking-wider text-muted uppercase">
           <div className="flex items-center gap-2 font-mono">
             <span className="inline-block h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]" />
-            <span className="font-semibold text-cream">2026 FBS Season</span>
+            <span className="font-semibold text-cream">{profile.seasonLabel}</span>
             <span className="text-line-bright">•</span>
-            <span>136 Programs</span>
+            <span>{profile.programsLabel}</span>
             <span className="hidden sm:inline text-line-bright">•</span>
-            <span className="hidden sm:inline">Borda Count (136–1 Pts)</span>
+            <span className="hidden sm:inline">{profile.scoringLabel}</span>
           </div>
           <div className="font-mono text-gold/90">
-            Baseline: Oct. 18 AP Top 25
+            Baseline: {profile.pollTitle} Top 25
           </div>
         </div>
       </div>
 
       {/* Main header */}
       <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
-        <Link
-          href="/"
+          <Link
+          href={profile.standingsHref}
           className="group flex items-center gap-3 focus:outline-none"
         >
           <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-gold/40 bg-gradient-to-br from-gold/25 via-card to-field shadow-inner transition-transform group-hover:scale-105">
@@ -62,7 +65,7 @@ export function SiteHeader() {
               CFB Community Poll
             </span>
             <span className="text-[11px] font-medium tracking-widest text-muted uppercase">
-              The National Fan-Ranked 136
+              FBS and FCS, ranked by the fans
             </span>
           </div>
         </Link>
@@ -70,7 +73,29 @@ export function SiteHeader() {
         <nav className="flex flex-wrap items-center gap-2 text-sm">
           <div className="flex items-center rounded-full border border-line bg-card/80 p-1">
             <Link
-              href="/"
+              href={isBallot ? "/ballot" : "/"}
+              className={`rounded-full px-3 py-1.5 font-display text-sm font-semibold tracking-wider uppercase transition-all ${
+                isFcs
+                  ? "text-cream/85 hover:text-cream"
+                  : "bg-gold text-field shadow-sm"
+              }`}
+            >
+              FBS
+            </Link>
+            <Link
+              href={isBallot ? "/ballot/fcs" : "/fcs"}
+              className={`rounded-full px-3 py-1.5 font-display text-sm font-semibold tracking-wider uppercase transition-all ${
+                isFcs
+                  ? "bg-gold text-field shadow-sm"
+                  : "text-cream/85 hover:text-cream"
+              }`}
+            >
+              FCS
+            </Link>
+          </div>
+          <div className="flex items-center rounded-full border border-line bg-card/80 p-1">
+            <Link
+              href={profile.standingsHref}
               className={`rounded-full px-3.5 py-1.5 font-display text-sm font-semibold tracking-wider uppercase transition-all ${
                 isPoll
                   ? "bg-gold text-field shadow-sm"
@@ -80,7 +105,7 @@ export function SiteHeader() {
               Standings
             </Link>
             <Link
-              href="/ballot"
+              href={profile.ballotHref}
               className={`rounded-full px-3.5 py-1.5 font-display text-sm font-semibold tracking-wider uppercase transition-all ${
                 isBallot
                   ? "bg-gold text-field shadow-sm"

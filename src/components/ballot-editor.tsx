@@ -25,20 +25,24 @@ import {
   RankTierPill,
   TeamCrest,
 } from "@/components/team-visuals";
+import { DIVISION_PROFILES, type Division } from "@/lib/division";
 import { startingOrder, type Team } from "@/lib/poll";
 import { getTeamStyle } from "@/lib/team-meta";
 
-type TierSlice = "all" | "top25" | "26-50" | "51-100" | "101-136";
+type TierSlice = "all" | "top25" | "26-50" | "51-100" | "101-end";
 
 export function BallotEditor({
   teams,
   userId,
+  division,
   hasExistingBallot = false,
 }: {
   teams: Team[];
   userId: string;
+  division: Division;
   hasExistingBallot?: boolean;
 }) {
+  const profile = DIVISION_PROFILES[division];
   const [order, setOrder] = useState(teams);
   const [ownerId, setOwnerId] = useState(userId);
 
@@ -82,7 +86,7 @@ export function BallotEditor({
       if (tierSlice === "top25" && rank > 25) return false;
       if (tierSlice === "26-50" && (rank < 26 || rank > 50)) return false;
       if (tierSlice === "51-100" && (rank < 51 || rank > 100)) return false;
-      if (tierSlice === "101-136" && rank < 101) return false;
+      if (tierSlice === "101-end" && rank < 101) return false;
 
       const matchesConference =
         conference === "" || team.conference === conference;
@@ -138,7 +142,7 @@ export function BallotEditor({
   }
 
   function resetToApBaseline() {
-    setOrder((full) => startingOrder(full));
+    setOrder((full) => startingOrder(full, profile.seed));
   }
 
   function revertChanges() {
@@ -148,7 +152,7 @@ export function BallotEditor({
   function onSave() {
     setError(null);
     startTransition(async () => {
-      const result = await saveBallot(order.map((team) => team.id));
+      const result = await saveBallot(order.map((team) => team.id), division);
       if (result?.error) setError(result.error);
     });
   }
@@ -162,7 +166,7 @@ export function BallotEditor({
         <div className="flex items-center justify-between rounded-2xl border border-line bg-card px-4 py-3">
           <div>
             <p className="font-display text-xs font-semibold tracking-wider text-muted uppercase">
-              Your #1 Pick (136 Pts)
+              Your #1 Pick ({order.length} Pts)
             </p>
             <p className="mt-0.5 font-display text-xl font-bold text-gold uppercase">
               {topPick?.name ?? "—"}
@@ -181,7 +185,7 @@ export function BallotEditor({
                 ? "Unsaved ranking adjustments"
                 : hasExistingBallot
                   ? "Saved to public poll"
-                  : "Seeded from Oct. 18 AP Top 25"}
+                  : profile.savedSeed}
             </p>
           </div>
           <span
@@ -217,7 +221,7 @@ export function BallotEditor({
               onClick={resetToApBaseline}
               className="rounded-lg border border-line bg-field px-2.5 py-1.5 font-display text-xs font-semibold tracking-wider text-muted uppercase transition hover:border-gold hover:text-cream"
             >
-              AP Seed
+              {profile.seedButton}
             </button>
           </div>
         </div>
@@ -265,11 +269,11 @@ export function BallotEditor({
           <div className="flex flex-wrap items-center gap-1.5">
             {(
               [
-                { id: "all", label: "All 136" },
+                { id: "all", label: `All ${order.length}` },
                 { id: "top25", label: "Top 25" },
                 { id: "26-50", label: "#26–50" },
                 { id: "51-100", label: "#51–100" },
-                { id: "101-136", label: "#101–136" },
+                { id: "101-end", label: `#101–${order.length}` },
               ] as const
             ).map((tab) => (
               <button
@@ -319,6 +323,7 @@ export function BallotEditor({
                 team={team}
                 rank={rankById.get(team.id) ?? 0}
                 teamCount={order.length}
+                division={division}
                 onMove={moveToRank}
               />
             ))}
@@ -350,13 +355,16 @@ function SortableTeam({
   team,
   rank,
   teamCount,
+  division,
   onMove,
 }: {
   team: Team;
   rank: number;
   teamCount: number;
+  division: Division;
   onMove: (teamId: number, rank: number) => void;
 }) {
+  const profile = DIVISION_PROFILES[division];
   const {
     attributes,
     listeners,
@@ -379,9 +387,9 @@ function SortableTeam({
 
   const rowBorder = isDragging
     ? "border-gold bg-card-hover shadow-2xl ring-2 ring-gold/40 z-20"
-    : rank <= 4
+    : rank <= profile.byeRank
       ? "border-gold/35 bg-card hover:border-gold/60"
-      : rank <= 12
+      : rank <= profile.playoffRank
         ? "border-emerald-400/25 bg-card hover:border-emerald-400/50"
         : rank <= 25
           ? "border-sky-400/20 bg-card hover:border-sky-400/40"
@@ -430,7 +438,13 @@ function SortableTeam({
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <p className="truncate font-semibold text-cream">{team.name}</p>
-            <RankTierPill rank={rank} />
+            <RankTierPill
+              rank={rank}
+              byeRank={profile.byeRank}
+              playoffRank={profile.playoffRank}
+              byeLabel={profile.tierBye}
+              fieldLabel={profile.tierField}
+            />
           </div>
           <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-muted">
             <span className="hidden sm:inline">{style.mascot}</span>
@@ -448,6 +462,9 @@ function SortableTeam({
             teamName={team.name}
             communityRank={rank}
             hasBallots={true}
+            pollShort={profile.pollShort}
+            pollTitle={profile.pollTitle}
+            seed={profile.seed}
           />
         </div>
 

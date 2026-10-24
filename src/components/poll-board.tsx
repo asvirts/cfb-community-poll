@@ -5,22 +5,29 @@ import { useMemo, useState } from "react";
 import {
   ApComparisonBadge,
   ConferenceBadge,
-  getApRank,
   RankTierPill,
   TeamCrest,
 } from "@/components/team-visuals";
+import { DIVISION_PROFILES, type Division } from "@/lib/division";
 import { startingOrder, type Standing } from "@/lib/poll";
 import { getConferenceMeta, getTeamStyle } from "@/lib/team-meta";
 
 type ViewTab = "all" | "top25" | "conferences";
 
-export function PollBoard({ standings }: { standings: Standing[] }) {
+export function PollBoard({
+  standings,
+  division,
+}: {
+  standings: Standing[];
+  division: Division;
+}) {
+  const profile = DIVISION_PROFILES[division];
   const ballotCount = standings[0]?.ballot_count ?? 0;
   const hasBallots = ballotCount > 0;
 
   const ordered = useMemo(() => {
-    return hasBallots ? standings : startingOrder(standings);
-  }, [standings, hasBallots]);
+    return hasBallots ? standings : startingOrder(standings, profile.seed);
+  }, [standings, hasBallots, profile.seed]);
 
   const [view, setView] = useState<ViewTab>("all");
   const [query, setQuery] = useState("");
@@ -29,7 +36,7 @@ export function PollBoard({ standings }: { standings: Standing[] }) {
   const teamCount = ordered.length;
   const maxPointsPerTeam = ballotCount * teamCount;
 
-  // Map each team_id to its true overall rank (1..136)
+  // Map each team_id to its true overall rank
   const rankMap = useMemo(() => {
     const map = new Map<number, number>();
     ordered.forEach((team, idx) => {
@@ -46,7 +53,7 @@ export function PollBoard({ standings }: { standings: Standing[] }) {
         conference: string;
         teamCount: number;
         top25Count: number;
-        top12Count: number;
+        fieldCount: number;
         totalPoints: number;
         rankSum: number;
         bestTeam: Standing;
@@ -62,7 +69,7 @@ export function PollBoard({ standings }: { standings: Standing[] }) {
           conference: team.conference,
           teamCount: 1,
           top25Count: rank <= 25 ? 1 : 0,
-          top12Count: rank <= 12 ? 1 : 0,
+          fieldCount: rank <= profile.playoffRank ? 1 : 0,
           totalPoints: team.points,
           rankSum: rank,
           bestTeam: team,
@@ -71,7 +78,7 @@ export function PollBoard({ standings }: { standings: Standing[] }) {
       } else {
         existing.teamCount += 1;
         if (rank <= 25) existing.top25Count += 1;
-        if (rank <= 12) existing.top12Count += 1;
+        if (rank <= profile.playoffRank) existing.fieldCount += 1;
         existing.totalPoints += team.points;
         existing.rankSum += rank;
       }
@@ -82,7 +89,7 @@ export function PollBoard({ standings }: { standings: Standing[] }) {
       const avgB = b.rankSum / b.teamCount;
       return avgA - avgB;
     });
-  }, [ordered]);
+  }, [ordered, profile.playoffRank]);
 
   const conferences = useMemo(
     () => [...new Set(ordered.map((t) => t.conference))].sort(),
@@ -112,8 +119,8 @@ export function PollBoard({ standings }: { standings: Standing[] }) {
 
   const topFour = ordered.slice(0, 4);
   const leader = ordered[0];
-  const cutlineTeam = ordered[11];
-  const firstOutTeam = ordered[12];
+  const cutlineTeam = ordered[profile.playoffRank - 1];
+  const firstOutTeam = ordered[profile.playoffRank];
   const topConf = conferenceStats[0];
 
   const isUnfilteredList =
@@ -134,12 +141,12 @@ export function PollBoard({ standings }: { standings: Standing[] }) {
                   Opening Kickoff — Pre-Poll Seedings Active
                 </p>
                 <p className="text-sm leading-relaxed text-cream/90">
-                  No ballots yet. This list starts from the Oct. 18 AP Top 25, then the rest of FBS in alphabetical order. Rank every team to open the poll.
+                  {profile.emptyBanner}
                 </p>
               </div>
             </div>
             <Link
-              href="/ballot"
+              href={profile.ballotHref}
               className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-gold px-5 py-2.5 font-display text-sm font-bold tracking-wider text-field uppercase shadow-md transition hover:bg-gold-bright"
             >
               Cast First Ballot →
@@ -199,7 +206,7 @@ export function PollBoard({ standings }: { standings: Standing[] }) {
             <p className="mt-2 border-t border-line/60 pt-2 font-mono text-[11px] text-gold/90">
               {hasBallots
                 ? `${leader.points.toLocaleString()} pts • ${leader.first_place_votes} first-place ${leader.first_place_votes === 1 ? "vote" : "votes"}`
-                : "Oct. 18 AP Poll #1 Seed"}
+                : profile.leaderSeed}
             </p>
           </div>
         ) : null}
@@ -209,7 +216,7 @@ export function PollBoard({ standings }: { standings: Standing[] }) {
           <div className="flex flex-col justify-between rounded-2xl border border-line bg-card/90 p-4 shadow-sm">
             <div className="flex items-center justify-between">
               <span className="font-display text-xs font-semibold tracking-widest text-muted uppercase">
-                CFP #12 Cutline
+                {profile.cutlineCard}
               </span>
               <span className="rounded bg-emerald-500/15 px-1.5 py-0.5 font-mono text-[10px] font-semibold text-emerald-300">
                 LAST IN
@@ -222,14 +229,14 @@ export function PollBoard({ standings }: { standings: Standing[] }) {
                   #12 {cutlineTeam.name}
                 </p>
                 <p className="truncate text-xs text-muted">
-                  First out: #13 {firstOutTeam?.name ?? "—"}
+                  First out: #{profile.playoffRank + 1} {firstOutTeam?.name ?? "—"}
                 </p>
               </div>
             </div>
             <p className="mt-2 border-t border-line/60 pt-2 font-mono text-[11px] text-muted">
               {hasBallots && firstOutTeam
-                ? `+${(cutlineTeam.points - firstOutTeam.points).toLocaleString()} pts ahead of #13`
-                : `${cutlineTeam.conference} • AP #12 Seed`}
+                ? `+${(cutlineTeam.points - firstOutTeam.points).toLocaleString()} pts ahead of #${profile.playoffRank + 1}`
+                : `${cutlineTeam.conference} • ${profile.pollShort} #${profile.playoffRank} Seed`}
             </p>
           </div>
         ) : null}
@@ -263,13 +270,13 @@ export function PollBoard({ standings }: { standings: Standing[] }) {
           <div className="flex items-center gap-2.5">
             <span className="h-4 w-1 rounded-full bg-gold" />
             <h2 className="font-display text-lg font-bold tracking-wider text-cream uppercase">
-              Top 4 — Projected First-Round Bye Seeds
+              {profile.podiumTitle}
             </h2>
           </div>
           <span className="font-mono text-xs text-muted">
             {hasBallots
               ? `Based on ${ballotCount} ${ballotCount === 1 ? "ballot" : "ballots"}.`
-              : "Pre-poll AP Top 4 seeds"}
+              : profile.podiumFallback}
           </span>
         </div>
 
@@ -305,6 +312,9 @@ export function PollBoard({ standings }: { standings: Standing[] }) {
                     teamName={team.name}
                     communityRank={rank}
                     hasBallots={hasBallots}
+                    pollShort={profile.pollShort}
+                    pollTitle={profile.pollTitle}
+                    seed={profile.seed}
                   />
                 </div>
 
@@ -329,7 +339,7 @@ export function PollBoard({ standings }: { standings: Standing[] }) {
                     <span className="text-gold">
                       {hasBallots
                         ? `${team.first_place_votes} 1st-pl (${pct}%)`
-                        : `AP #${getApRank(team.name) ?? rank}`}
+                        : `${profile.pollShort} #${profile.seed.indexOf(team.name) >= 0 ? profile.seed.indexOf(team.name) + 1 : rank}`}
                     </span>
                   </div>
                   <div className="h-1.5 w-full overflow-hidden rounded-full bg-field">
@@ -359,7 +369,7 @@ export function PollBoard({ standings }: { standings: Standing[] }) {
                   : "text-muted hover:text-cream"
               }`}
             >
-              All 136 Teams
+              All {teamCount} Teams
             </button>
             <button
               type="button"
@@ -413,7 +423,7 @@ export function PollBoard({ standings }: { standings: Standing[] }) {
               aria-label="Filter standings by conference"
               className="rounded-xl border border-line bg-field px-3.5 py-2 text-sm text-cream outline-none transition focus:border-gold"
             >
-              <option value="">All Conferences (136)</option>
+              <option value="">All Conferences ({teamCount})</option>
               {conferences.map((conf) => (
                 <option key={conf} value={conf}>
                   {conf}
@@ -434,7 +444,7 @@ export function PollBoard({ standings }: { standings: Standing[] }) {
                 : "border-line bg-field/60 text-muted hover:border-line-bright hover:text-cream"
             }`}
           >
-            All FBS ({ordered.length})
+            All {profile.name} ({ordered.length})
           </button>
           {conferenceStats.map((stat) => {
             const active = selectedConference === stat.conference;
@@ -489,7 +499,7 @@ export function PollBoard({ standings }: { standings: Standing[] }) {
                   <th className="px-4 py-3 text-right">Teams</th>
                   <th className="px-4 py-3 text-right">Avg Rank</th>
                   <th className="px-4 py-3 text-right">Top 25</th>
-                  <th className="px-4 py-3 text-right">CFP Top 12</th>
+                  <th className="px-4 py-3 text-right">{profile.playoffStat}</th>
                   <th className="px-4 py-3">Highest Ranked Team</th>
                 </tr>
               </thead>
@@ -519,7 +529,7 @@ export function PollBoard({ standings }: { standings: Standing[] }) {
                       {stat.top25Count}
                     </td>
                     <td className="px-4 py-3 text-right font-mono text-gold">
-                      {stat.top12Count}
+                      {stat.fieldCount}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2.5">
@@ -542,7 +552,7 @@ export function PollBoard({ standings }: { standings: Standing[] }) {
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line bg-field-elevated px-4 py-3 text-xs text-muted">
           <div className="flex items-center gap-2">
             <span className="font-mono font-semibold text-cream">
-              Showing {filteredTeams.length} of {ordered.length} FBS teams
+              Showing {filteredTeams.length} of {ordered.length} {profile.name} teams
             </span>
             {selectedConference ? (
               <span>
@@ -552,13 +562,13 @@ export function PollBoard({ standings }: { standings: Standing[] }) {
           </div>
           <div className="flex items-center gap-4 font-mono text-[11px]">
             <span className="inline-flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-gold" /> #1–4 CFP Bye
+              <span className="h-2 w-2 rounded-full bg-gold" /> {profile.legendBye}
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-emerald-400" /> #5–12 CFP Field
+              <span className="h-2 w-2 rounded-full bg-emerald-400" /> {profile.legendField}
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-sky-400" /> #13–25 Ranked
+              <span className="h-2 w-2 rounded-full bg-sky-400" /> {profile.legendRanked}
             </span>
           </div>
         </div>
@@ -570,7 +580,7 @@ export function PollBoard({ standings }: { standings: Standing[] }) {
                 <th className="w-20 px-4 py-3 font-semibold">Rank</th>
                 <th className="px-4 py-3 font-semibold">Team</th>
                 <th className="px-4 py-3 font-semibold">Conference</th>
-                <th className="px-4 py-3 font-semibold">vs. AP</th>
+                <th className="px-4 py-3 font-semibold">{profile.comparisonHeader}</th>
                 {hasBallots ? (
                   <>
                     <th className="px-4 py-3 text-right font-semibold">
@@ -603,8 +613,8 @@ export function PollBoard({ standings }: { standings: Standing[] }) {
                     ? teamCount + 1 - team.points / ballotCount
                     : rank;
 
-                const showByeCutline = isUnfilteredList && rank === 4;
-                const showPlayoffCutline = isUnfilteredList && rank === 12;
+                const showByeCutline = isUnfilteredList && rank === profile.byeRank;
+                const showPlayoffCutline = isUnfilteredList && rank === profile.playoffRank;
                 const showTop25Cutline = isUnfilteredList && rank === 25;
 
                 return (
@@ -617,6 +627,7 @@ export function PollBoard({ standings }: { standings: Standing[] }) {
                     pct={pct}
                     avgRank={avgRank}
                     teamCount={teamCount}
+                    profile={profile}
                     showByeCutline={showByeCutline}
                     showPlayoffCutline={showPlayoffCutline}
                     showTop25Cutline={showTop25Cutline}
@@ -630,7 +641,7 @@ export function PollBoard({ standings }: { standings: Standing[] }) {
         {filteredTeams.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-2 py-12 text-center">
             <p className="font-display text-xl font-semibold text-cream">
-              No FBS programs match that filter
+              No {profile.name} programs match that filter
             </p>
             <p className="text-sm text-muted">
               Try clearing your search query or switching back to All Conferences.
@@ -661,6 +672,7 @@ function TeamRowGroup({
   pct,
   avgRank,
   teamCount,
+  profile,
   showByeCutline,
   showPlayoffCutline,
   showTop25Cutline,
@@ -672,14 +684,15 @@ function TeamRowGroup({
   pct: number;
   avgRank: number;
   teamCount: number;
+  profile: (typeof DIVISION_PROFILES)[Division];
   showByeCutline: boolean;
   showPlayoffCutline: boolean;
   showTop25Cutline: boolean;
 }) {
   const rankBadgeColor =
-    rank <= 4
+    rank <= profile.byeRank
       ? "text-gold font-bold"
-      : rank <= 12
+      : rank <= profile.playoffRank
         ? "text-emerald-300 font-bold"
         : rank <= 25
           ? "text-sky-300 font-semibold"
@@ -701,7 +714,13 @@ function TeamRowGroup({
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="font-semibold text-cream">{team.name}</span>
-                <RankTierPill rank={rank} />
+                <RankTierPill
+                  rank={rank}
+                  byeRank={profile.byeRank}
+                  playoffRank={profile.playoffRank}
+                  byeLabel={profile.tierBye}
+                  fieldLabel={profile.tierField}
+                />
               </div>
               <p className="text-xs text-muted">{mascot}</p>
             </div>
@@ -715,6 +734,9 @@ function TeamRowGroup({
             teamName={team.name}
             communityRank={rank}
             hasBallots={hasBallots}
+            pollShort={profile.pollShort}
+            pollTitle={profile.pollTitle}
+            seed={profile.seed}
           />
         </td>
         {hasBallots ? (
@@ -758,7 +780,7 @@ function TeamRowGroup({
             colSpan={hasBallots ? 7 : 5}
             className="border-y border-gold/40 px-4 py-1.5 text-center font-display text-xs font-bold tracking-[0.2em] text-gold uppercase"
           >
-            ▲ Top 4 First-Round Bye Cutline ▲
+            {profile.byeCutline}
           </td>
         </tr>
       ) : null}
@@ -769,7 +791,7 @@ function TeamRowGroup({
             colSpan={hasBallots ? 7 : 5}
             className="border-y border-emerald-400/40 px-4 py-1.5 text-center font-display text-xs font-bold tracking-[0.2em] text-emerald-300 uppercase"
           >
-            ▲ 12-Team College Football Playoff Cutline ▲
+            {profile.playoffCutline}
           </td>
         </tr>
       ) : null}
@@ -780,7 +802,7 @@ function TeamRowGroup({
             colSpan={hasBallots ? 7 : 5}
             className="border-y border-sky-400/40 px-4 py-1.5 text-center font-display text-xs font-bold tracking-[0.2em] text-sky-300 uppercase"
           >
-            ▲ Top 25 National Poll Cutline — Others Receiving Votes Below ▲
+            {profile.rankedCutline}
           </td>
         </tr>
       ) : null}

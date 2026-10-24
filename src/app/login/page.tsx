@@ -12,7 +12,7 @@ export default function LoginPage() {
           Enter the Press Box
         </h1>
         <p className="max-w-md text-sm text-muted">
-          Sign in to submit or update your 1–136 FBS ballot in the community poll.
+          Sign in to submit or update your FBS ballot and your separate FCS ballot.
         </p>
       </div>
       <Suspense fallback={<p className="text-muted">Loading sign in…</p>}>
