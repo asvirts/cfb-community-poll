@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { connection } from "next/server";
 import { BallotEditor } from "@/components/ballot-editor";
 import { listBallotPicks, listTeams } from "@/lib/db";
-import { alphabeticalTeams, orderTeams } from "@/lib/poll";
+import { orderTeams, startingOrder } from "@/lib/poll";
 
 export default function BallotPage() {
   return (
@@ -11,7 +11,7 @@ export default function BallotPage() {
       <div className="flex flex-col gap-2">
         <h1 className="font-display text-5xl leading-none font-semibold">My ballot</h1>
         <p className="max-w-2xl text-muted">
-          Put every FBS team in order. Your ballot replaces the previous one, and the public poll updates from the latest ranking.
+          Put every FBS team in order. A new ballot starts from the latest AP Top 25, then the rest of FBS in alphabetical order. Your ballot replaces the previous one, and the public poll updates from the latest ranking.
         </p>
       </div>
       <Suspense fallback={<p className="text-muted">Loading your ballot…</p>}>
@@ -33,7 +33,7 @@ async function BallotLoader() {
   try {
     const teams = await listTeams();
     const picks = await listBallotPicks(userId);
-    ordered = picks.length > 0 ? orderTeams(teams, picks) : alphabeticalTeams(teams);
+    ordered = picks.length > 0 ? orderTeams(teams, picks) : startingOrder(teams);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown database error";
     return (

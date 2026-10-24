@@ -38,6 +38,43 @@ export function orderTeams(teams: Team[], picks: Pick[]): Team[] {
   return [...ordered, ...rest];
 }
 
-export function alphabeticalTeams(teams: Team[]) {
-  return [...teams].sort((a, b) => a.name.localeCompare(b.name));
+/** AP Top 25 through games of Oct. 17, 2026, released Oct. 18. */
+export const AP_TOP_25 = [
+  "Miami (FL)",
+  "BYU",
+  "Ohio State",
+  "Notre Dame",
+  "Georgia",
+  "Indiana",
+  "Ole Miss",
+  "Texas Tech",
+  "UCLA",
+  "Utah",
+  "Tennessee",
+  "Kentucky",
+  "Alabama",
+  "Houston",
+  "Iowa",
+  "USC",
+  "Wake Forest",
+  "LSU",
+  "Texas",
+  "Florida",
+  "Boise State",
+  "Missouri",
+  "SMU",
+  "Northwestern",
+  "Arizona",
+] as const;
+
+export function startingOrder<T extends { name: string }>(teams: T[]): T[] {
+  const rank = new Map<string, number>(AP_TOP_25.map((name, index) => [name, index]));
+  return [...teams].sort((a, b) => {
+    const aRank = rank.get(a.name);
+    const bRank = rank.get(b.name);
+    if (aRank !== undefined && bRank !== undefined) return aRank - bRank;
+    if (aRank !== undefined) return -1;
+    if (bRank !== undefined) return 1;
+    return a.name.localeCompare(b.name);
+  });
 }

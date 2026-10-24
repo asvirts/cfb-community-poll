@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { connection } from "next/server";
 import { pollStandings } from "@/lib/db";
-import type { Standing } from "@/lib/poll";
+import { startingOrder, type Standing } from "@/lib/poll";
 
 export default function HomePage() {
   return (
@@ -44,25 +44,25 @@ async function Standings() {
     return (
       <div className="flex flex-col gap-4">
         <p className="rounded-xl border border-line bg-card px-4 py-3 text-cream">
-          No ballots yet. Rank every team to open the poll.
+          No ballots yet. This list starts from the Oct. 18 AP Top 25, then the rest of FBS in alphabetical order. Rank every team to open the poll.
         </p>
         <div className="overflow-x-auto rounded-2xl border border-line">
           <table className="w-full min-w-[32rem] text-left">
             <thead className="bg-card text-sm text-muted">
               <tr>
+                <th className="px-4 py-3 font-medium">Rank</th>
                 <th className="px-4 py-3 font-medium">Team</th>
                 <th className="px-4 py-3 font-medium">Conference</th>
               </tr>
             </thead>
             <tbody>
-              {[...standings]
-                .sort((a, b) => a.name.localeCompare(b.name))
-                .map((team) => (
-                  <tr key={team.team_id} className="border-t border-line">
-                    <td className="px-4 py-2.5 font-semibold">{team.name}</td>
-                    <td className="px-4 py-2.5 text-muted">{team.conference}</td>
-                  </tr>
-                ))}
+              {startingOrder(standings).map((team, index) => (
+                <tr key={team.team_id} className="border-t border-line">
+                  <td className="px-4 py-2.5 font-display text-xl text-gold">{index + 1}</td>
+                  <td className="px-4 py-2.5 font-semibold">{team.name}</td>
+                  <td className="px-4 py-2.5 text-muted">{team.conference}</td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
