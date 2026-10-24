@@ -1,12 +1,8 @@
+import { Show, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
-import { connection } from "next/server";
-import { signOut } from "@/app/actions";
-import { currentUser } from "@/lib/auth";
+import { Suspense } from "react";
 
-export async function SiteHeader() {
-  await connection();
-  const user = await currentUser().catch(() => null);
-
+export function SiteHeader() {
   return (
     <header className="sticky top-0 z-20 border-b border-line bg-field/95 backdrop-blur">
       <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-3">
@@ -20,24 +16,29 @@ export async function SiteHeader() {
           <Link href="/ballot" className="rounded-full px-3 py-1.5 text-cream hover:bg-card">
             My ballot
           </Link>
-          {user ? (
-            <form action={signOut} className="flex items-center gap-2">
-              <span className="max-w-40 truncate text-muted">{user.email}</span>
-              <button
-                type="submit"
-                className="rounded-full border border-line px-3 py-1.5 text-cream hover:border-gold"
-              >
-                Sign out
-              </button>
-            </form>
-          ) : (
-            <Link
-              href="/login"
-              className="rounded-full bg-gold px-3 py-1.5 font-semibold text-field hover:bg-gold/90"
-            >
-              Sign in
-            </Link>
-          )}
+          <Suspense fallback={<div className="h-8 w-28" />}>
+            <Show when="signed-out">
+              <SignInButton mode="modal">
+                <button
+                  type="button"
+                  className="cursor-pointer rounded-full bg-gold px-3 py-1.5 font-semibold text-field hover:bg-gold/90"
+                >
+                  Sign in
+                </button>
+              </SignInButton>
+              <SignUpButton mode="modal">
+                <button
+                  type="button"
+                  className="cursor-pointer rounded-full border border-line px-3 py-1.5 text-cream hover:border-gold"
+                >
+                  Sign up
+                </button>
+              </SignUpButton>
+            </Show>
+            <Show when="signed-in">
+              <UserButton />
+            </Show>
+          </Suspense>
         </nav>
       </div>
     </header>

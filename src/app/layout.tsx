@@ -1,3 +1,4 @@
+import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { Barlow_Condensed, Source_Sans_3 } from "next/font/google";
 import { Suspense } from "react";
@@ -25,10 +26,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${display.variable} ${sans.variable} h-full antialiased`}>
       <body className="min-h-full bg-field font-sans text-cream">
-        <Suspense fallback={<div className="h-16 border-b border-line bg-field" />}>
-          <SiteHeader />
+        <Suspense fallback={null}>
+          <ClerkProvider>
+            <SiteHeader />
+            {children}
+          </ClerkProvider>
         </Suspense>
-        {children}
       </body>
     </html>
   );

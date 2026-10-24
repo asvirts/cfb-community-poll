@@ -5,18 +5,9 @@ import type { Pick, Standing, Team } from "@/lib/poll";
 export class BallotError extends Error {}
 
 const SCHEMA = [
-  `create table if not exists users (
-    id uuid primary key default gen_random_uuid(),
-    email text not null unique,
-    password_hash text not null,
-    created_at timestamptz not null default now()
-  )`,
-  `create table if not exists sessions (
-    token_hash text primary key,
-    user_id uuid not null references users (id) on delete cascade,
-    expires_at timestamptz not null
-  )`,
-  `create index if not exists sessions_user_id_idx on sessions (user_id)`,
+  `drop table if exists sessions`,
+  `alter table if exists ballots drop constraint if exists ballots_user_id_fkey`,
+  `drop table if exists users`,
   `create table if not exists teams (
     id bigint generated always as identity primary key,
     name text not null unique,
@@ -24,9 +15,10 @@ const SCHEMA = [
   )`,
   `create table if not exists ballots (
     id uuid primary key default gen_random_uuid(),
-    user_id uuid not null unique references users (id) on delete cascade,
+    user_id text not null unique,
     updated_at timestamptz not null default now()
   )`,
+  `alter table ballots alter column user_id type text using user_id::text`,
   `create table if not exists ballot_picks (
     ballot_id uuid not null references ballots (id) on delete cascade,
     team_id bigint not null references teams (id) on delete cascade,

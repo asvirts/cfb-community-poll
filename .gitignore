@@ -43,3 +43,6 @@ next-env.d.ts
 
 # local browser automation
 .playwright-cli/
+
+# clerk keyless mode
+.clerk/

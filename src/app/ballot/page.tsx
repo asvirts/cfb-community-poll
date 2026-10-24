@@ -1,8 +1,7 @@
+import { auth } from "@clerk/nextjs/server";
 import { Suspense } from "react";
 import { connection } from "next/server";
-import { redirect } from "next/navigation";
 import { BallotEditor } from "@/components/ballot-editor";
-import { currentUser } from "@/lib/auth";
 import { listBallotPicks, listTeams } from "@/lib/db";
 import { alphabeticalTeams, orderTeams } from "@/lib/poll";
 
@@ -24,26 +23,16 @@ export default function BallotPage() {
 
 async function BallotLoader() {
   await connection();
-  let user;
-  try {
-    user = await currentUser();
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown database error";
-    return (
-      <p role="alert" className="text-gold">
-        Could not load your ballot. {message}
-      </p>
-    );
-  }
+  const { userId, redirectToSignIn } = await auth();
 
-  if (!user) {
-    redirect("/login");
+  if (!userId) {
+    return redirectToSignIn();
   }
 
   let ordered;
   try {
     const teams = await listTeams();
-    const picks = await listBallotPicks(user.id);
+    const picks = await listBallotPicks(userId);
     ordered = picks.length > 0 ? orderTeams(teams, picks) : alphabeticalTeams(teams);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown database error";
@@ -54,5 +43,5 @@ async function BallotLoader() {
     );
   }
 
-  return <BallotEditor key={user.id} userId={user.id} teams={ordered} />;
+  return <BallotEditor key={userId} userId={userId} teams={ordered} />;
 }
