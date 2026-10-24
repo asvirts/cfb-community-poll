@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-field: #10140f;
+  --color-card: #1b2418;
+  --color-line: #31402d;
+  --color-cream: #f4f0e6;
+  --color-muted: #b7b2a4;
+  --color-gold: #e2b657;
+  --font-sans: var(--font-source), sans-serif;
+  --font-display: var(--font-barlow), sans-serif;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--color-field);
+  color: var(--color-cream);
+}
