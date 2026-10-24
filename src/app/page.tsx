@@ -25,6 +25,35 @@ async function Standings() {
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("poll_standings");
 
+  // #region agent log
+  fetch("http://127.0.0.1:7933/ingest/3dcd5539-b183-4df0-9335-9ff526c6cf8e", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "85283f" },
+    body: JSON.stringify({
+      sessionId: "85283f",
+      runId: "pre-fix",
+      hypothesisId: "A-E",
+      location: "src/app/page.tsx:26",
+      message: "poll_standings rpc result",
+      data: {
+        host: (() => {
+          try {
+            return new URL(process.env.NEXT_PUBLIC_SUPABASE_URL ?? "").host;
+          } catch {
+            return "invalid-url";
+          }
+        })(),
+        errorCode: error?.code ?? null,
+        errorMessage: error?.message ?? null,
+        errorHint: error?.hint ?? null,
+        errorDetails: error?.details ?? null,
+        rowCount: Array.isArray(data) ? data.length : null,
+      },
+      timestamp: Date.now(),
+    }),
+  }).catch(() => {});
+  // #endregion
+
   if (error) {
     return (
       <p role="alert" className="text-gold">
