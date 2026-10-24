@@ -27,7 +27,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className={`${display.variable} ${sans.variable} h-full antialiased`}>
       <body className="min-h-full bg-field font-sans text-cream">
         <Suspense fallback={null}>
-          <ClerkProvider>
+          <ClerkProvider
+            signInUrl="/login"
+            signUpUrl="/sign-up"
+            signInFallbackRedirectUrl="/ballot"
+            signUpFallbackRedirectUrl="/ballot"
+          >
             <SiteHeader />
             {children}
           </ClerkProvider>

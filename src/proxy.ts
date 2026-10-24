@@ -2,11 +2,19 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
 const isProtectedRoute = createRouteMatcher(["/ballot(.*)"]);
 
-export default clerkMiddleware(async (auth, request) => {
-  if (isProtectedRoute(request)) {
-    await auth.protect();
-  }
-});
+export default clerkMiddleware(
+  async (auth, request) => {
+    if (isProtectedRoute(request)) {
+      const signInUrl = new URL("/login", request.url);
+      signInUrl.searchParams.set("redirect_url", request.url);
+      await auth.protect({ unauthenticatedUrl: signInUrl.toString() });
+    }
+  },
+  {
+    signInUrl: "/login",
+    signUpUrl: "/sign-up",
+  },
+);
 
 export const config = {
   matcher: [

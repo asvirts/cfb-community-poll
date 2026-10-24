@@ -1,4 +1,4 @@
-import { Show, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
+import { Show, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { Suspense } from "react";
 
@@ -18,22 +18,18 @@ export function SiteHeader() {
           </Link>
           <Suspense fallback={<div className="h-8 w-28" />}>
             <Show when="signed-out">
-              <SignInButton mode="modal">
-                <button
-                  type="button"
-                  className="cursor-pointer rounded-full bg-gold px-3 py-1.5 font-semibold text-field hover:bg-gold/90"
-                >
-                  Sign in
-                </button>
-              </SignInButton>
-              <SignUpButton mode="modal">
-                <button
-                  type="button"
-                  className="cursor-pointer rounded-full border border-line px-3 py-1.5 text-cream hover:border-gold"
-                >
-                  Sign up
-                </button>
-              </SignUpButton>
+              <Link
+                href="/login"
+                className="rounded-full bg-gold px-3 py-1.5 font-semibold text-field hover:bg-gold/90"
+              >
+                Sign in
+              </Link>
+              <Link
+                href="/sign-up"
+                className="rounded-full border border-line px-3 py-1.5 text-cream hover:border-gold"
+              >
+                Sign up
+              </Link>
             </Show>
             <Show when="signed-in">
               <UserButton />
