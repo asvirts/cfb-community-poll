@@ -74,24 +74,6 @@ async function migrate() {
     await sql.unsafe(statement);
   }
 
-  // The only ballot saved before the AP starting order was a test: Alabama first, then alphabetical.
-  await sql`
-    delete from ballots b
-    where (select count(*) from ballots) = 1
-      and (
-        select t.name
-        from ballot_picks bp
-        join teams t on t.id = bp.team_id
-        where bp.ballot_id = b.id and bp.rank = 1
-      ) = 'Alabama'
-      and (
-        select t.name
-        from ballot_picks bp
-        join teams t on t.id = bp.team_id
-        where bp.ballot_id = b.id and bp.rank = 2
-      ) = 'Air Force'
-  `;
-
   const [{ count }] = await sql<{ count: number }[]>`
     select count(*)::int as count from teams
   `;
