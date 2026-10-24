@@ -1,21 +1,65 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-field: #10140f;
-  --color-card: #1b2418;
-  --color-line: #31402d;
-  --color-cream: #f4f0e6;
-  --color-muted: #b7b2a4;
-  --color-gold: #e2b657;
+  --color-field: #0b100c;
+  --color-field-elevated: #101711;
+  --color-card: #151e16;
+  --color-card-hover: #1b271c;
+  --color-line: #29382a;
+  --color-line-bright: #3c523d;
+  --color-cream: #f5f1e6;
+  --color-muted: #a6a295;
+  --color-gold: #e4b854;
+  --color-gold-bright: #f3ca68;
+  --color-turf: #1e4628;
   --font-sans: var(--font-source), sans-serif;
   --font-display: var(--font-barlow), sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, monospace;
 }
 
 html {
   color-scheme: dark;
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--color-field);
+  background-color: var(--color-field);
+  background-image:
+    radial-gradient(ellipse 90% 45% at 50% -10%, rgba(228, 184, 84, 0.10), transparent 65%),
+    radial-gradient(ellipse 70% 50% at 85% 15%, rgba(30, 70, 40, 0.22), transparent 60%),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+    linear-gradient(to right, rgba(255, 255, 255, 0.012) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 100% 64px, 64px 100%;
+  background-attachment: fixed;
   color: var(--color-cream);
+}
+
+/* Subtle yard-line hash mark divider */
+.yard-divider {
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgba(228, 184, 84, 0.35) 0px,
+    rgba(228, 184, 84, 0.35) 2px,
+    transparent 2px,
+    transparent 16px
+  );
+}
+
+/* Custom subtle scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0b100c;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #29382a;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3c523d;
 }
