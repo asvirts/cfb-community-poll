@@ -1,8 +1,35 @@
 {
   "version": 1,
-  "source": {},
-  "resolved": {
+  "source": {
+    "name": "cfb-community-poll",
     "account_id": "8bac5053cc0448ced93c05985636036c",
+    "workers_dev": true,
+    "preview_urls": true,
+    "routes": [
+      {
+        "pattern": "cfbcommunity.com",
+        "custom_domain": true
+      },
+      {
+        "pattern": "www.cfbcommunity.com",
+        "custom_domain": true
+      }
+    ]
+  },
+  "resolved": {
+    "name": "cfb-community-poll",
+    "account_id": "8bac5053cc0448ced93c05985636036c",
+    "workers_dev": true,
+    "routes": [
+      {
+        "pattern": "cfbcommunity.com",
+        "custom_domain": true
+      },
+      {
+        "pattern": "www.cfbcommunity.com",
+        "custom_domain": true
+      }
+    ],
     "d1_databases": [
       {
         "binding": "DB",
@@ -11,7 +38,7 @@
         "migrations_dir": "./db/migrations"
       }
     ],
-    "name": "cfb-community-poll"
+    "preview_urls": true
   },
-  "text": "{\n  \"account_id\": \"8bac5053cc0448ced93c05985636036c\",\n  \"d1_databases\": [\n    {\n      \"binding\": \"DB\",\n      \"database_name\": \"cfb-community-poll-db\",\n      \"database_id\": \"ab06db27-8461-42c3-bf2c-da1c30769cb3\",\n      \"migrations_dir\": \"./db/migrations\"\n    }\n  ],\n  \"name\": \"cfb-community-poll\"\n}\n"
+  "text": "// void:published-traffic:v1:eyJ3b3JrZXJzX2RldiI6dHJ1ZSwicHJldmlld191cmxzIjp0cnVlLCJyb3V0ZXMiOlt7InBhdHRlcm4iOiJjZmJjb21tdW5pdHkuY29tIiwiY3VzdG9tX2RvbWFpbiI6dHJ1ZX0seyJwYXR0ZXJuIjoid3d3LmNmYmNvbW11bml0eS5jb20iLCJjdXN0b21fZG9tYWluIjp0cnVlfV19\n{\n  \"name\": \"cfb-community-poll\",\n  \"account_id\": \"8bac5053cc0448ced93c05985636036c\",\n  \"workers_dev\": true,\n  \"routes\": [\n    {\n      \"pattern\": \"cfbcommunity.com\",\n      \"custom_domain\": true\n    },\n    {\n      \"pattern\": \"www.cfbcommunity.com\",\n      \"custom_domain\": true\n    }\n  ],\n  \"d1_databases\": [\n    {\n      \"binding\": \"DB\",\n      \"database_name\": \"cfb-community-poll-db\",\n      \"database_id\": \"ab06db27-8461-42c3-bf2c-da1c30769cb3\",\n      \"migrations_dir\": \"./db/migrations\"\n    }\n  ],\n  \"preview_urls\": true\n}\n"
 }

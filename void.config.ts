@@ -4,6 +4,17 @@ export default defineConfig({
   cloudflare: {
     name: "cfb-community-poll",
     account_id: "8bac5053cc0448ced93c05985636036c",
+    workers_dev: true,
+    preview_urls: true,
+    routes: [
+      { pattern: "cfbcommunity.com", custom_domain: true },
+      { pattern: "www.cfbcommunity.com", custom_domain: true },
+    ],
+  },
+  routing: {
+    redirects: {
+      "https://www.cfbcommunity.com/*": { to: "https://cfbcommunity.com/:splat", status: 301 },
+    },
   },
   worker: {
     compatibility_date: "2026-02-24",

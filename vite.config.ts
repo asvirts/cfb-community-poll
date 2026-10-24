@@ -8,24 +8,27 @@ import { defineConfig } from "vite-plus";
 import { voidPlugin } from "void";
 
 function cloudflareDeployPointer() {
+  const writePointer = () => {
+    if (process.env.VOID_CLOUDFLARE_DEPLOY_BUILD !== "1") return;
+    const workerConfig = join(process.cwd(), "dist/ssr/wrangler.json");
+    if (!existsSync(workerConfig)) return;
+    const directory = join(process.cwd(), ".wrangler", "deploy");
+    mkdirSync(directory, { recursive: true });
+    writeFileSync(
+      join(directory, "config.json"),
+      JSON.stringify({
+        configPath: "../../dist/ssr/wrangler.json",
+        auxiliaryWorkers: [],
+      }),
+    );
+  };
   return {
     name: "cfb-cloudflare-deploy-pointer",
     apply: "build" as const,
     enforce: "post" as const,
-    closeBundle() {
-      if (process.env.VOID_CLOUDFLARE_DEPLOY_BUILD !== "1") return;
-      const workerConfig = join(process.cwd(), "dist/ssr/wrangler.json");
-      if (!existsSync(workerConfig)) return;
-      const directory = join(process.cwd(), ".wrangler", "deploy");
-      mkdirSync(directory, { recursive: true });
-      writeFileSync(
-        join(directory, "config.json"),
-        JSON.stringify({
-          configPath: "../../dist/ssr/wrangler.json",
-          auxiliaryWorkers: [],
-        }),
-      );
-    },
+    writeBundle: writePointer,
+    closeBundle: writePointer,
+    buildApp: { order: "post" as const, handler: writePointer },
   };
 }
 
