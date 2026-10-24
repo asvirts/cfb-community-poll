@@ -1,6 +1,10 @@
 import { defineConfig } from "void/config";
 
 export default defineConfig({
+  cloudflare: {
+    name: "cfb-community-poll",
+    account_id: "8bac5053cc0448ced93c05985636036c",
+  },
   worker: {
     compatibility_date: "2026-02-24",
   },
